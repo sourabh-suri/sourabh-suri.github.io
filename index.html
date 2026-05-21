@@ -5,14 +5,180 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sourabh Suri Portfolio</title>
-	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-	<link rel="icon" href="favicon.ico" type="image/x-icon">
+    <title>Sourabh Suri | AR/VR Computer Vision Engineer</title>
+    <meta name="description" content="Portfolio of Sourabh Suri - Computer Vision & Deep Learning Engineer at Sony Corporation, Tokyo. Specializing in real-time AR/VR systems, HOI detection, and production ML.">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
     <link rel="stylesheet" href="libs/font-awesome/css/font-awesome.min.css">
-	<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
+    <style>
+        /* Custom overrides for updated portfolio */
+        #lead-overlay {
+            background: rgba(14, 36, 58, 0.85);
+        }
+        #lead-content h2 {
+            color: #64b5f6;
+        }
+        .btn-rounded-white:hover {
+            color: #0e243a;
+            background: #fff;
+        }
+        header a {
+            color: #0e243a;
+        }
+        header a:hover {
+            color: #1565c0;
+        }
+        #experience-timeline:before,
+        #experience-timeline:after {
+            background: #1565c0;
+        }
+        .vtimeline-icon {
+            background: #1565c0;
+        }
+        #contact {
+            background: #0e243a;
+        }
+        #contact-form input,
+        #contact-form textarea {
+            background: #1a3a5c;
+        }
+        #contact-form input:focus,
+        #contact-form textarea:focus {
+            background: #0d2840;
+        }
+        #contact-form button {
+            color: #0e243a;
+        }
+        .heading:after {
+            background: #1565c0;
+        }
+
+        /* Project card improvements */
+        .project {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .project:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .project-info {
+            margin-left: 350px;
+        }
+        .project-image {
+            width: 350px;
+            height: 250px;
+            background: #fff;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .project-image img {
+            width: 350px;
+            height: 250px;
+            object-fit: contain;
+        }
+
+        /* Sony project badge */
+        .badge-sony {
+            display: inline-block;
+            background: #1565c0;
+            color: #fff;
+            font-size: 0.7em;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-left: 8px;
+            vertical-align: middle;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        .badge-academic {
+            display: inline-block;
+            background: #5c6bc0;
+            color: #fff;
+            font-size: 0.7em;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-left: 8px;
+            vertical-align: middle;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        /* Skills section improvements */
+        #skills li {
+            transition: transform 0.2s ease;
+        }
+        #skills li:hover {
+            transform: scale(1.05);
+        }
+        .skill-category {
+            color: #1565c0;
+            font-weight: 700;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 0 8px 0;
+            display: block;
+        }
+        .skill-category:first-child {
+            margin-top: 0;
+        }
+
+        /* About section photo */
+        #about img {
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        /* Section dividers */
+        .section-subtitle {
+            color: #74808a;
+            font-size: 1em;
+            font-weight: 300;
+            margin-top: -20px;
+            margin-bottom: 30px;
+        }
+
+        /* Project tech tags */
+        .tech-tags {
+            margin-top: 10px;
+        }
+        .tech-tag {
+            display: inline-block;
+            background: #e8eaf6;
+            color: #374054;
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin: 2px 3px 2px 0;
+        }
+
+        /* Experience details */
+        .exp-detail {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #5a6a7a;
+            line-height: 1.6;
+        }
+        .exp-detail li {
+            margin-bottom: 4px;
+        }
+
+        /* Responsive project images */
+        @media only screen and (max-width: 768px) {
+            .project-image,
+            .project-image img {
+                width: 100%;
+                height: 200px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -32,10 +198,10 @@
                 <a href="#experience">Experience</a>
             </li>
             <li>
-                <a href="#education">Education</a>
+                <a href="#projects">Projects</a>
             </li>
             <li>
-                <a href="#projects">Projects</a>
+                <a href="#education">Education</a>
             </li>
             <li>
                 <a href="#skills">Skills</a>
@@ -50,8 +216,8 @@
     <div id="lead">
         <div id="lead-content">
             <h1>Sourabh<br>Suri</h1>
-            <h2>Electrical Engineer</h2>
-            <a href="https://drive.google.com/file/d/1YXbWxdnyX_41EMEFf8UTgjCuCYx0sdUy/view?usp=sharing" class="btn-rounded-white">Resume</a>
+            <h2>AR/VR Computer Vision Engineer</h2>
+            <a href="resume.html" class="btn-rounded-white">Resume</a>
         </div>
         <!-- End #lead-content -->
 
@@ -68,26 +234,20 @@
 
     <div id="about">
         <div class="container">
-            <!--div class="row"-->
-				<div class="col-md-4" data-aos="flip-up" data-aos-duration="1500" >
-					<img src="images/mypic.png" />
-				</div>
+            <div class="col-md-4" data-aos="flip-up" data-aos-duration="1500">
+                <img src="images/mypic.png" alt="Sourabh Suri" />
+            </div>
 
-				<div class="col-md-8">
-					<h2  class="heading" data-aos="fade-right" data-aos-duration="1500">About Me</h2>
-					<p data-aos="fade-left" data-aos-duration="1500">
-            Welcome to my Portfolio!!! <br>
-                <br>
-						A post graduate in Electrical Engineering with decent intelligence quotient<br>
-                <br>
-						Machine Learning enthusiast learning XR technologies for gaming engines <br>
-                <br>
-						Self motivated with zeal to effectively identify, learn and solve problems<br>
-                <br>
-						Interested in projects to meet the design & development needs of industry<br>
-					</p>
-				</div>
-			<!--/div-->
+            <div class="col-md-8">
+                <h2 class="heading" data-aos="fade-right" data-aos-duration="1500">About Me</h2>
+                <p data-aos="fade-left" data-aos-duration="1500">
+                    <strong>Computer Vision and Deep Learning Engineer</strong> with 4+ years at <strong>Sony Corporation, Tokyo</strong>, building real-time AI that ships in AR/VR headsets, manufacturing lines, and retail venues.
+                    <br><br>
+                    I design and deploy end-to-end vision pipelines spanning <strong>human-object interaction detection</strong>, <strong>eye-tracking</strong>, <strong>action recognition</strong>, <strong>super-resolution</strong>, and <strong>FPGA-accelerated rendering</strong> for next-generation XR products.
+                    <br><br>
+                    My work sits at the intersection of deep learning research and production engineering, turning state-of-the-art models into low-latency systems that run on mobile SoCs and edge GPUs. I hold an <strong>M.Tech from IIT Bombay</strong> (1st rank, 9.9/10 CPI) and am passionate about pushing the boundaries of what machines can see and understand in real time.
+                </p>
+            </div>
         </div>
     </div>
     <!-- End #about -->
@@ -96,565 +256,349 @@
         <h2 class="heading">Experience</h2>
         <div id="experience-timeline">
 
-  	     <div data-aos="flip-up" data-aos-duration="1500" data-date="October 2021 – Current">
+            <div data-aos="flip-up" data-aos-duration="1500" data-date="October 2021 - Present">
                 <h3>Sony Group Corporation</h3>
-                <h4>AR/VR System Engineer</h4>
+                <h4>AR/VR System Engineer &nbsp;|&nbsp; Tokyo, Japan</h4>
                 <p>
-                  - Developing XR core technology for ultra low-latency, power efficient & small form factor to wear<br>
-                  - Rendering virtual objects with sense of real one and to provide new expression of reality<br>
-                  - Contributing to content creation to realize new generation of the conten production workflow<br>
-                  - Integrating XR prototype system and showing its technical demo applications with game engines
-  			   </p>
+                    Building real-time computer vision and deep learning systems for next-generation XR products, manufacturing automation, and immersive retail experiences.
+                </p>
+                <ul class="exp-detail">
+                    <li><strong>Current R&D Focus (FY26):</strong> Decoupled HOI auto-annotation, automated PDCA accuracy loops, and LLM-powered recognition auto-generation</li>
+                    <li><strong>Real-Time HOI Detection Platform:</strong> Built a full-stack system combining YOLOX, TIGeR, S3D, and GNN to detect human-object interactions across retail and industrial environments, with auto-annotation via SAM3, HOISTFormer, and DEIMv2</li>
+                    <li><strong>Production Line Action Recognition:</strong> Deployed real-time worker action monitoring using ActionFormer, Meta GNN, YOLOX, and label encoding to convert detected actions into workflow steps, flagging errors within 3 seconds of a 3-minute process. Optimized to run 4 concurrent stations on a single RTX 4090</li>
+                    <li><strong>Image Resolution Enhancement:</strong> Developed multi-frame super-resolution achieving 2x visual acuity improvement for XR display output</li>
+                    <li><strong>Eye-Tracking Pipeline:</strong> Built a gaze estimation pipeline with synthetic dataset generation and mobile SoC optimization for foveated rendering</li>
+                    <li><strong>Occlusion Algorithm:</strong> Engineered real-time hand-mesh generation with 88.5x speedup, enabling seamless virtual-real object occlusion for AR pass-through</li>
+                    <li><strong>FPGA-Accelerated Distortion Correction:</strong> Designed a distortion correction module on FPGA achieving 60 FPS at 200 MHz with 60% lower power consumption</li>
+                    <li><strong>Multi-Camera CV Capture System:</strong> Architected a 15-camera (IMX418) synchronized capture system at 60 FPS feeding 4K OLED displays</li>
+                </ul>
             </div>
 
-
-		     <div data-aos="flip-down" data-aos-duration="1500" data-date="July 2018 – July 2021">
+            <div data-aos="flip-down" data-aos-duration="1500" data-date="July 2018 - July 2021">
                 <h3>IIT Bombay</h3>
-                <h4>Research Assistant</h4>
+                <h4>Research Assistant &nbsp;|&nbsp; Mumbai, India</h4>
                 <p>
-                   Institute Research Assistant in Wadhwani Electronics Lab (WEL) to assist in all the major electronics hardware activities
-				   (lab courses and projects) of the EE department at IIT Bombay.
-
-				   </p>
-            </div>
-		     <div data-aos="flip-up" data-aos-duration="1500" data-date="March 2020 – June 2020">
-                <h3>Arthimpact Digital Loan Private Limited</h3>
-                <h4>Internship</h4>
-                <p>
-                  Project dealt with work on classification of KYC documents and OCR extraction project using Neural Network concepts of machine learning.
-
-				   </p>
+                    Institute Research Assistant in Wadhwani Electronics Lab (WEL), supporting electronics hardware activities, lab courses, and research projects for the EE department.
+                </p>
             </div>
 
-			     <div data-aos="flip-down" data-aos-duration="1500" data-date="May 2018 to July 2018">
+            <div data-aos="flip-up" data-aos-duration="1500" data-date="March 2020 - June 2020">
+                <h3>Arthimpact Digital Loan Pvt. Ltd.</h3>
+                <h4>Machine Learning Intern</h4>
+                <p>
+                    Developed KYC document classification and OCR extraction system using neural networks, YOLO v3 for region detection, and Tesseract for text extraction.
+                </p>
+            </div>
+
+            <div data-aos="flip-down" data-aos-duration="1500" data-date="May 2018 - July 2018">
                 <h3>PBOPlus Consulting Services Pvt. Ltd.</h3>
                 <h4>Business Analyst</h4>
                 <p>
-                    Business Consultant to analyze the business processes to devise a solution that can help a business grow and become profitable. To automate a process to improve product and service reliability.
-                </p>
-            </div>
-            <div data-aos="flip-up" data-aos-duration="1500" data-date="October 2017 – May 2018">
-                <h3>Chegg</h3>
-                <h4>Electrical Engineer Expert</h4>
-                <p>
-                    Worked as Electrical Engineering Expert which deals in helping electrical community all over the world to understand engineering concepts,
-					its problems and potential solutions.
+                    Analyzed business processes and devised automation solutions to improve product and service reliability and profitability.
                 </p>
             </div>
 
-            <div data-aos="flip-down" data-aos-duration="1500" data-date="July 2017 – October 2017">
-                <h3>Unitex Lex</h3>
+            <div data-aos="flip-up" data-aos-duration="1500" data-date="July 2017 - October 2017">
+                <h3>UnitedLex</h3>
                 <h4>Associate Patent Engineer</h4>
                 <p>
-					Job profile includes Patent searching, Infringement, in-validity and portolio evaluation.
+                    Conducted patent searching, infringement analysis, invalidity studies, and portfolio evaluations for technology patents.
                 </p>
             </div>
 
-            <div data-aos="flip-up" data-aos-duration="1500" data-date="June 2016 – July 2016">
-                <h3>Laser Science & Technology Centre, DRDO</h3>
+            <div data-aos="flip-down" data-aos-duration="1500" data-date="June 2016 - July 2016">
+                <h3>DRDO - Laser Science & Technology Centre</h3>
                 <h4>Intern</h4>
                 <p>
-					Servo Control System design two axes Gimbal Assembly which is used for tracking purposes with precision, accuracy and fast response.
-				</p>
-            </div>
-
-            <div data-aos="flip-down" data-aos-duration="1500" data-date="December 2015 – January 2016">
-                <h3>Engineers India Limited</h3>
-                <h4>Vocational Training</h4>
-                <p>
-					Preparation of instrument data sheet, Material requistion for procurement of various instruments and technical bid analysis papers to
-					contribute for Aishwarya Project, Haldia Refinery (IOCL).
-				</p>
-            </div>
-
-	        <div data-aos="flip-up" data-aos-duration="1500" data-date="November 2014 – Decemeber 2014">
-                <h3>nne Pharmaplan India Limited</h3>
-                <h4>Training</h4>
-                <p>
-					Power system protection and switch gear control was studied using single line diagram for design.
-				</p>
+                    Designed servo control systems for two-axis gimbal assemblies used in precision tracking applications.
+                </p>
             </div>
 
         </div>
     </div>
     <!-- End #experience -->
 
-    <div id="education">
-        <h2 class="heading">Education</h2>
-        <div data-aos="zoom-in-up" data-aos-duration="1500" class="education-block">
-            <h3>Indian Institute of Technology, Bombay (IIT B)</h3>
-            <span class="education-date">July 2018 - July 2021</span>
-            <h4>Masters of Technology in Power Electronics and Power Systems</h4>
-            <p>
-				CPI- 9.9<br><br>
-        Spring (2020-21, SPI-10): <br>II Stage Project: Electrical Impedance Tomography Imaging With Neural Networks, High Performance Scientific Computing <br><br>
-				Autumn (2020-21, SPI-10): <br> I Stage Project: Smart Energy Autonomous Miniaturized Sensors, Geospatial Predictive Modelling<br><br>
-			  Spring (2019-20, SPI-10): <br>Digital Protection of Power Systems, Systems Design, Processor Design, Introduction to Machine Learning<br><br>
-				Autumn (2019-20, SPI-9): <br>Control and Computational Laboratory, Computer Aided Power System Analysis, VLSI Design, Seminar-Digital and Analog Hybrid Computers<br><br>
-				Spring (2018-19, SPI-10): <br>Power Electronics - II,	V L S I Design Lab,	Embedded Systems Design, High Power Converters and their Utility Applications<br>	<br>
-				Autumn (2018-19, SPI-10):<br> Power Electronics - I, Power Systems & Power Electronics Laboratory, Microprocessor Applications in Power Electronics, Communication Skills
-
-			</p>
-        </div>
-
-		<div data-aos="zoom-in-up" data-aos-duration="1500" class="education-block">
-            <h3>Delhi Technological University, formerly Delhi College of Engineering</h3>
-            <span class="education-date">July 2013 - June 2017</span>
-            <h4>Bachelors of Technology in Electrical & Electronics Engineering</h4>
-            <p>
-				Agg-80.14%<br><br>
-				SEMESTER 8 (January – May 2017, Marks: 85.87%):<br> Utilization of Electrical Energy, Power System Operation and Control, Computer Control of Processes.<br><br>
-				SEMESTER 7 (August – December 2016, Marks: 84.13%):<br> Control System- II, Non Conventional Energy Systems, HVDC Transmission Systems, Restructured Power System.<br><br>
-				SEMESTER 6 (January – May 2016, Marks: 81.20%):<br> Electrical Drives and their applications, Micro controllers and Embedded systems, Computer Architecture, Communication systems, Electrical Machines-III.<br><br>
-				SEMESTER 5 (August – December 2015, Marks: 78.73%):<br> Power Electronics ,Control Systems, Data Communication and Computer Networks, Digital Signal Processing, Microprocessor and Applications.<br><br>
-				SEMESTER 4 ( January - May 2015, Marks: 77.97%):<br> Linear Integrated Circuits Communication systems-I , Digital Circuit and Systems, Power Systems- II , Electrical Machines-II , Electromagnetic field theory.<br><br>
-				SEMESTER 3 (August – December 2014, Marks: 70.07%):<br> Electronic Devices and Circuits , Electrical Machines-I , Network Analysis and Synthesis ,Power Systems, Electrical and Electronic Measurement , Engineering Economics.<br><br>
-				SEMESTER 2 (August – May 2014, Marks: 76.07%):<br> Mathematics-II , Environmental Sciences , Applied Physics- II, Engineering Materials, Basic Mechanical Engineering , Programming Fundamentals.<br><br>
-				SEMESTER 1 (August – December 2013, Marks: 76.33%):<br> Mathematics-I , Communication Skills , Applied Physics-I Applied Chemistry , Electrical Sciences , Fundamentals of Information Technology.
-			</p>
-        </div>
-
-        <!-- End .education-block -->
-      <div data-aos="zoom-in-up" data-aos-duration="1500" class="education-block">
-              <h3>Kanda Gaigo Career College(KGCC)</h3>
-              <span class="education-date">July 2021 - April 2022</span>
-              <h4>Japanese Language Level: Above JLPT N4 </h4>
-              <p>
-                Developing a foundation for Japanese language skills for future business<br>
-                Developing the Japanese language communication skills for living in Japan
-          </p>
-          </div>
-
-          <!-- End .education-block -->
-
-        <div data-aos="zoom-in-up" data-aos-duration="1500" class="education-block">
-            <h3>Bal Mandir Senior Secondary School</h3>
-            <span class="education-date">July 2008 - June 2012</span>
-            <h4>Central Board of Secondary Education</h4>
-            <ul>
-                <li>
-                   XII: Percentage: 92% <br>
-					Subjects: Physics, Chemistry, Mathematics , Computer Science, English and Physical Education. <br>
-					Senior Secondary Certificate (A Level Equivalent)<br>
-                </li>
-                <li>
-                    X :CGPA: 8.6/10<br>
-					Subjects: Mathematics, Science, Social Science, English, Hindi, Sanskrit<br>
-					Secondary School Certificate (GCSE Equivalent)<br>
-                </li>
-            </ul>
-        </div>
-        <!-- End .education-block -->
-    </div>
-    <!-- End #education -->
-
     <div id="projects" class="background-alt">
         <h2 class="heading">Projects</h2>
+        <p class="section-subtitle">Sony R&D and selected academic work</p>
         <div class="container">
-        <div class="row">
-        <div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/EIT.jpg" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3> Electrical Impedance Tomography Imaging With Neural Networks</h3>
-                        <p>
-                          A non-invasive, non-radiant, low latency, simple equipment medical imaging technology
-                          <br> Developing continuous monitoring of ventilation & conductivity estimation system
-                          <br> Improving quality of reconstructed images via Neural Networks over conventional methods
-                          <br> 3D thorax imaging is optimised using bit quantisation & multiplier-less arithmetic
-                          </p>
-                        <a href="https://drive.google.com/file/d/1BU_UD4Ty8Tz4ePmO8eo_hNbFJgCQ8ifM/view?usp=sharing">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
+            <div class="row">
 
-				<div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/Kmeans.jpg" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>Image Color Quamtization Using K-means Clustering</h3>
-                        <p>
-                          <br> To partition different image pixels into K clusters with nearest mean for size compression
-                          <br> Using OpenCV for image handling & C++/CUDA code for K-means clustering on images
-                          <br> Performance analysis of serial & parallel code execution by OpenMP, MPI & CUDA
-                          </p>
-                        <a href="https://github.com/sourabh-suri/K-means-Clustering">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-
-				<div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/UG.png" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3> Smart Energy Autonomous Miniaturized Sensors</h3>
-                        <p>
-                          Developing RFID sensors based 3 point star network for signal propagation in soil & water
-                          <br> Modelled & simulated EM, MI (magnetic induction) & waveguide based signal propagation
-                          <br> Reduction in path loss by 81% for 5m space between coils for resonating MI waveguide
-                          <br> Hardware by integrating various subsystems for smart sensor’s data & power transfer
-                          </p>
-                        <a href="https://drive.google.com/file/d/1wVKva3QTZEoU61XIDtXBEQ1lAd-4NGnE/view?usp=sharing">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-				<div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/OCR2.png" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3> Classification of KYC documents and OCR extraction</h3>
-                        <p>
-						                    Optical Character Recognition (OCR) is used to convert scanned images to text.
-                                <br> Building a model for OCR with regions of an image detection. <br> Using Vott for data tagging and labeling.
-                                <br> Converting the labelled data to Yolo v3 Format
-                                <br> Training on Darknet framework to crop regions from the original image.
-                                <br> OCR wrapers- Tesseract and Py-tesseract are used to obtain selective text. 						</p>
-                        <a href="https://github.com/sourabh-suri/Pan-Card-OCR">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-
-          <div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
-              <div class="project-image">
-                  <img src="images/Invasive.png" />
-              </div>
-              <!-- End .project-image -->
-              <div class="project-info">
-                  <h3> Non-Invasive Multi-Parameter Health Estimation for Pre-Diagnosis</h3>
-                  <p>
-                    Estimation of non-invasive haemoglobin & blood glucose level from PPG signal
-                    <br> Extracted feautres from PPG signal conditioning correlated to a health target
-                    <br> Realised Principal Component Analysis (PCA) with 95% of retained variance
-                    <br>Estimated a model by test-train-valid split to minimise mean square error to 0.01
-                  </p>
-                  <a href="https://drive.google.com/file/d/127LkvOlJD0IC85H4YIr5Ttt1Gdw_EwXf/view?usp=sharing">View Project</a>
-              </div>
-              <!-- End .project-info -->
-          </div>
-          <!-- End .project -->
-
-
-				<div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/Seminar.png" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>Digital and Analog Hybrid Computing Architecture </h3>
-                        <p>
-                          Identified certain limitations faced by computers in solving real time simulation problems
-                          <br>Numerical methods of solving differential equations takes many iterations to converge
-                          <br>Proposed scheme for data flow in digital domain while ALU & oscillators in analog domain
-                          <br>Mapped simulation models on hybrid architecture for solving ODEs in continuous time
-                        </p>
-                        <a href="https://drive.google.com/file/d/19v9ZtqD7jjeF7PDpMMt58W7ApCntiie5/view?usp=sharing">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-				<div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/Multiplier.jpg" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3> Dadda Multiplier</h3>
-                        <p>
-						                    Designing a Dadda multiplier for unsigned 16x16 bit multiplication in synthesizable VHDL.
-                                <br> A Brent Kung adder is implemented for the final addition in Dadda multiplier algorithm.
-                                <br> A high speed & area efficient multiplier with low power consumption.
-
-						</p>
-                        <a href="https://github.com/sourabh-suri/16x16-bit-Dada-multiplication">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-
-
-				<div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/kaggle2.png" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3> Attrition Classification</h3>
-                        <p>
-					Implementing a classifier to predict whether an employee will leave the company or not.
-<br> Data processing to encode, scale, remove redundant features, etc to define a better model.
-<br> Cross validation and train-test spliting are compared to improve the model training.
-
-						</p>
-                        <a href="https://github.com/sourabh-suri/Attrition-Classification">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-
-
-				<div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/Adder.jpg" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3> Brent Kung Adder</h3>
-                        <p>
-						Synthesizable VHDL implementation of logarithmic adder using Brent Kung achitecture.
-<br> Addition of two 32 bit operands.
-<br> Log2N levels of logic- making it a fast adder.
-<br>Low gate count- used for low power applications.
-
-						</p>
-                        <a href="https://github.com/sourabh-suri/32-bit-Brent-Kung-architecture">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-
-				<div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/Logical.jpg" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>Logical Effort</h3>
-                        <p>
-							Using ngspice, designing a minimum sized CMOS inverter.
-<br> Making the rise time and the fall time equal for some load capacitance.
-<br>Evaluating the inverter delay for different fanouts (DUT with 1, 2, 3, . . . 8 inverters).
-<br>Concluding the concept of logical effort.
-
-						</p>
-                        <a href="https://github.com/sourabh-suri/VLSI-Logical-Effort-">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-
-				<div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/sudoku.jpg" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>Hardware Accelerated Sudoku Solver</h3>
-                        <p>
-							A brute force algorithm on hardware is used to solve a sudoku.<br>
-							When a valid fill is not found backtracking is done.<br>
-							Backtracking is repeated until last number is a valid guess i.e guess out of 1 to 9.<br>
-							Digital logic realised using priority encoders and multiplexers.
-						</p>
-                        <a href="https://github.com/sourabh-suri/Sudoku-Solver">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-				<div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/SVM_margin.png" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3> Support Vector Machine</h3>
-                        <p>
-						SVMs, are a set of supervised learning methods used for classification, regression and outliers detection.
-<br>Writing a learning algorithm for classification analysis.
-<br>Source code includes kernel identification and its implementation as well.
-
-						</p>
-                        <a href="https://colab.research.google.com/drive/1s6l_JGiS4Szo0IIm1lfDPmV9qE8ryVKb?usp=sharing">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-
-				<div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/embedded.jpeg" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>Profiling of Home Equipment using WiFi</h3>
-                        <p> An embeded system with a user friendly GUI, web page hosted over server.
-			<br>Optimizing the intensity of a LED light fixature with logarithmic variation of light 				<br>Controlling the speed of fan for a particular work station.
-			</p>
-                        <a href="https://github.com/sourabh-suri/Home-Equipment-Profiling">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-				<div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/buck.jpg" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>Power Electronics and Power Systems Lab Project</h3>
-                        <p>
-						Regulated Power Supply Design +15V,-15V and +5V, 1 A current rating.<br>
-						DC-DC Buck Converter Design : 30W, 32V to 12V (2% ripple at voltage output).
-						</p>
-                        <a href="https://github.com/sourabh-suri/Power-Electronics-and-Power-Systems-Lab-Project">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-				<div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/statcom.jpg" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>High Power Converters Simulation</h3>
-                        <p>
-						STATCOM with State vector modulated inverter <br> -Regulate midpoint voltage of a 220KV transmission line using vector control.<br><br>
-						Static Var Compensator using TSC & FC-TCR <br> -Regulate the voltage of a 220KV transmission line from 0.7pu to 1.3pu with apt. filtering.
-						</p>
-                        <a href="https://github.com/sourabh-suri/High-Power-Converters">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-				<div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/PLL.jpg" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>Design of 3 phase PLL for 50Hz balanced, unbalanced and harmonics</h3>
-                        <p>
-					Frequency component extraction using reference frame transformation.<br>
-					Sine and cosine wave generation at the appropriate frequencies using harmonic oscillator.<br>
-					Low pass filter and PI regulator for appropriate PLL action.<br>
-						</p>
-                        <a href="https://github.com/sourabh-suri/PLL-for-50Hz">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-
-				<div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
-					<div class="project-image">
-						<img src="images/emulator.jpg" />
-					</div>
-					<!-- End .project-image -->
-					<div class="project-info">
-						<h3>Implementation of Buck converter based Solar Emulator using control scheme on FPGA</h3>
-						<p>
-							Power supply to emulate a photo voltaic panel behaviour irrespective of load characterstic.<br>
-							Emulate current-voltage (I-V) curve based on irradiance and temperature.<br>
-							The MPPT by closed loop boost converter to extract the minimum possible power.
-						</p>
-						<a href="https://drive.google.com/file/d/1o4ixZ7JDBiDYP5NISv03CaewC8WS2sVf/view?usp=sharing">View Project</a>
-					</div>
-					<!-- End .project-info -->
-				</div>
-					<!-- End .project -->
-
-
-
-                <div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/chopper.jpg" />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>Development of HMI to drive Class E chopper fed separately excited DC motor using PLC</h3>
-                        <p>
-							Implementation of closed loop speed control of DC motor<br>
-							Using PD controller on PLC and development of HMI using SCADA.<br>
-							At Project and Research Lab, Delhi Technological University.
-						</p>
-                        <a href="https://drive.google.com/file/d/14nPLHorVN1VUo4vLSpPuk5TYkD474aRZ/view?usp=sharing">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
+                <!-- Sony: HOI Detection Platform -->
                 <div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
                     <div class="project-image">
-                        <img src="images/plc.jpg" />
+                        <img src="images/hoi-platform.png" alt="Human-Object Interaction Detection Platform" />
                     </div>
-                    <!-- End .project-image -->
                     <div class="project-info">
-                        <h3>PLC SCADA Based Testing Equipment for Single Phase Transformer</h3>
+                        <h3>Real-Time HOI Detection Platform <span class="badge-sony">SONY</span></h3>
                         <p>
-							Open circuit & Short circuit testing process automation<br>
-							To resolve the problem of high voltage vicnity <br>
-							At Project and Research Lab.
-						</p>
-                        <a href="https://drive.google.com/file/d/1N-4O3LgQz33DcObXzAykFHnJHDNXOspN/view?usp=sharing">View Project</a>
+                            Full-stack human-object interaction detection system for retail IP pop-up shops and industrial environments. Detects customers interacting with in-store merchandise and triggers product-exclusive audio feedback in real time. Combines object detection, action recognition, and graph neural networks for robust interaction understanding.
+                        </p>
+                        <div class="tech-tags">
+                            <span class="tech-tag">YOLOX</span>
+                            <span class="tech-tag">TIGeR</span>
+                            <span class="tech-tag">S3D</span>
+                            <span class="tech-tag">GNN</span>
+                            <span class="tech-tag">SAM3</span>
+                            <span class="tech-tag">HOISTFormer</span>
+                            <span class="tech-tag">DEIMv2</span>
+                            <span class="tech-tag">Gradio</span>
+                        </div>
                     </div>
-                    <!-- End .project-info -->
                 </div>
                 <!-- End .project -->
 
+                <!-- Sony: Production Action Recognition -->
+                <div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/action-recognition.png" alt="Production Line Action Recognition" />
+                    </div>
+                    <div class="project-info">
+                        <h3>Production Line Action Recognition <span class="badge-sony">SONY</span></h3>
+                        <p>
+                            Real-time automated quality assurance for manufacturing lines. Monitors worker actions, converts detected actions into workflow steps, and flags incorrect procedures within 3 seconds of a 3-minute assembly process. Optimized inference to run 4 concurrent processing stations on a single RTX 4090 GPU.
+                        </p>
+                        <div class="tech-tags">
+                            <span class="tech-tag">ActionFormer</span>
+                            <span class="tech-tag">Meta GNN</span>
+                            <span class="tech-tag">YOLOX</span>
+                            <span class="tech-tag">Label Encoding</span>
+                            <span class="tech-tag">MLflow</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- End .project -->
+
+                <!-- Sony: Image Resolution Enhancement -->
+                <div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/image-resolution.png" alt="Multi-Frame Super Resolution for XR Displays" />
+                    </div>
+                    <div class="project-info">
+                        <h3>Image Resolution Enhancement <span class="badge-sony">SONY</span></h3>
+                        <p>
+                            Multi-frame super-resolution pipeline for XR display output. Achieved 2x visual acuity improvement by fusing temporal information across consecutive frames, enhancing the perceived sharpness of head-mounted display content without additional hardware cost.
+                        </p>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Super Resolution</span>
+                            <span class="tech-tag">Multi-Frame Fusion</span>
+                            <span class="tech-tag">PyTorch</span>
+                            <span class="tech-tag">CUDA</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- End .project -->
+
+                <!-- Sony: Eye Tracking -->
+                <div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/eye-tracking.png" alt="Eye-Tracking Pipeline for Foveated Rendering" />
+                    </div>
+                    <div class="project-info">
+                        <h3>Eye-Tracking Pipeline <span class="badge-sony">SONY</span></h3>
+                        <p>
+                            Gaze estimation system optimized for mobile SoC deployment in AR/VR headsets. Built a synthetic dataset generation pipeline to overcome real-data scarcity, trained lightweight models for real-time inference, and integrated with foveated rendering to reduce GPU workload while maintaining perceived visual quality.
+                        </p>
+                        <div class="tech-tags">
+                            <span class="tech-tag">EfficientNet</span>
+                            <span class="tech-tag">Synthetic Data</span>
+                            <span class="tech-tag">Mobile SoC</span>
+                            <span class="tech-tag">Foveated Rendering</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- End .project -->
+
+                <!-- Sony: Occlusion Algorithm -->
+                <div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/hand-occlusion.png" alt="Real-Time Hand Occlusion for AR Pass-Through" />
+                    </div>
+                    <div class="project-info">
+                        <h3>Occlusion Algorithm <span class="badge-sony">SONY</span></h3>
+                        <p>
+                            Real-time hand-mesh generation enabling seamless virtual-real object occlusion in AR pass-through mode. Engineered custom triangularization achieving 88.5x speedup over baseline Open3D methods, allowing convincing hand-over-virtual-object rendering at interactive frame rates on constrained hardware.
+                        </p>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Hand Mesh</span>
+                            <span class="tech-tag">Triangularization</span>
+                            <span class="tech-tag">Depth Estimation</span>
+                            <span class="tech-tag">AR Pass-Through</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- End .project -->
+
+                <!-- Sony: Distortion Correction -->
+                <div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/distortion-correction.png" alt="FPGA-Accelerated Distortion Correction" />
+                    </div>
+                    <div class="project-info">
+                        <h3>FPGA-Accelerated Distortion Correction <span class="badge-sony">SONY</span></h3>
+                        <p>
+                            Hardware-accelerated lens distortion correction module for XR headsets. Designed a pipelined FPGA architecture operating at 200 MHz to deliver 60 FPS correction with 60% lower power draw compared to GPU-based approaches, critical for battery-powered wearable devices.
+                        </p>
+                        <div class="tech-tags">
+                            <span class="tech-tag">FPGA</span>
+                            <span class="tech-tag">VHDL</span>
+                            <span class="tech-tag">200 MHz</span>
+                            <span class="tech-tag">60 FPS</span>
+                            <span class="tech-tag">Low Power</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- End .project -->
+
+                <!-- Academic: EIT Imaging -->
+                <div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/EIT.jpg" alt="Electrical Impedance Tomography with Neural Networks" />
+                    </div>
+                    <div class="project-info">
+                        <h3>EIT Imaging with Neural Networks <span class="badge-academic">IIT BOMBAY</span></h3>
+                        <p>
+                            Non-invasive, low-latency medical imaging system using neural networks to reconstruct conductivity maps from impedance measurements. Improved image quality over conventional methods with bit-quantized, multiplier-less arithmetic for efficient hardware deployment.
+                        </p>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Neural Networks</span>
+                            <span class="tech-tag">Medical Imaging</span>
+                            <span class="tech-tag">Hardware Optimization</span>
+                        </div>
+                        <a href="https://drive.google.com/file/d/1BU_UD4Ty8Tz4ePmO8eo_hNbFJgCQ8ifM/view?usp=sharing">View Project</a>
+                    </div>
+                </div>
+                <!-- End .project -->
+
+                <!-- Academic: K-means -->
+                <div data-aos="fade-left" data-aos-duration="1500" class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/Kmeans.jpg" alt="GPU-Accelerated Image Color Quantization" />
+                    </div>
+                    <div class="project-info">
+                        <h3>GPU-Accelerated Image Quantization <span class="badge-academic">IIT BOMBAY</span></h3>
+                        <p>
+                            High-performance K-means clustering for image color quantization with parallel implementations in OpenMP, MPI, and CUDA. Benchmarked serial vs. parallel execution across GPU architectures for image compression workloads.
+                        </p>
+                        <div class="tech-tags">
+                            <span class="tech-tag">CUDA</span>
+                            <span class="tech-tag">OpenMP</span>
+                            <span class="tech-tag">MPI</span>
+                            <span class="tech-tag">C++</span>
+                            <span class="tech-tag">OpenCV</span>
+                        </div>
+                        <a href="https://github.com/sourabh-suri/K-means-Clustering">View Project</a>
+                    </div>
+                </div>
+                <!-- End .project -->
+
+                <!-- Academic: KYC OCR -->
+                <div data-aos="fade-right" data-aos-duration="1500" class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/OCR2.png" alt="KYC Document Classification and OCR" />
+                    </div>
+                    <div class="project-info">
+                        <h3>KYC Document Classification & OCR <span class="badge-academic">INTERNSHIP</span></h3>
+                        <p>
+                            End-to-end pipeline for classifying KYC documents and extracting text using YOLO v3 for region detection on the Darknet framework, with Tesseract OCR for selective text extraction from detected regions.
+                        </p>
+                        <div class="tech-tags">
+                            <span class="tech-tag">YOLO v3</span>
+                            <span class="tech-tag">Darknet</span>
+                            <span class="tech-tag">Tesseract OCR</span>
+                            <span class="tech-tag">Python</span>
+                        </div>
+                        <a href="https://github.com/sourabh-suri/Pan-Card-OCR">View Project</a>
+                    </div>
+                </div>
+                <!-- End .project -->
 
             </div>
         </div>
     </div>
     <!-- End #projects -->
 
+    <div id="education">
+        <h2 class="heading">Education</h2>
+
+        <div data-aos="zoom-in-up" data-aos-duration="1500" class="education-block">
+            <h3>Indian Institute of Technology, Bombay</h3>
+            <span class="education-date">July 2018 - July 2021</span>
+            <h4>M.Tech in Power Electronics and Power Systems</h4>
+            <p>
+                <strong>CPI: 9.9/10 | 1st Rank</strong><br>
+                Thesis: Electrical Impedance Tomography Imaging with Neural Networks<br>
+                Key courses: Introduction to Machine Learning, Geospatial Predictive Modelling, VLSI Design, Embedded Systems, High Performance Scientific Computing
+            </p>
+        </div>
+
+        <div data-aos="zoom-in-up" data-aos-duration="1500" class="education-block">
+            <h3>Delhi Technological University</h3>
+            <span class="education-date">July 2013 - June 2017</span>
+            <h4>B.Tech in Electrical & Electronics Engineering</h4>
+            <p>
+                <strong>Aggregate: 80.14%</strong><br>
+                Key courses: Control Systems, DSP, Microprocessors, Power Electronics, Communication Systems
+            </p>
+        </div>
+
+        <div data-aos="zoom-in-up" data-aos-duration="1500" class="education-block">
+            <h3>Kanda Gaigo Career College (KGCC)</h3>
+            <span class="education-date">July 2021 - April 2022</span>
+            <h4>Japanese Language (Above JLPT N4)</h4>
+            <p>
+                Business Japanese communication skills for professional work in Japan
+            </p>
+        </div>
+
+    </div>
+    <!-- End #education -->
+
     <div id="skills">
         <h2 class="heading">Skills</h2>
+
+        <span class="skill-category">Deep Learning & Vision</span>
         <ul>
+            <li data-aos="fade-down" data-aos-duration="800">PyTorch</li>
+            <li data-aos="fade-down" data-aos-duration="900">YOLOX</li>
+            <li data-aos="fade-down" data-aos-duration="1000">DEIMv2</li>
+            <li data-aos="fade-down" data-aos-duration="1100">EfficientNet</li>
+            <li data-aos="fade-down" data-aos-duration="1200">GNN</li>
+            <li data-aos="fade-down" data-aos-duration="800">Meta GNN</li>
+            <li data-aos="fade-down" data-aos-duration="900">S3D</li>
+            <li data-aos="fade-down" data-aos-duration="1000">SAM3</li>
+            <li data-aos="fade-down" data-aos-duration="1100">HOISTFormer</li>
+            <li data-aos="fade-down" data-aos-duration="1200">TIGeR</li>
+            <li data-aos="fade-down" data-aos-duration="800">ActionFormer</li>
+            <li data-aos="fade-down" data-aos-duration="900">OpenCV</li>
+        </ul>
 
-            <li data-aos="fade-down" data-aos-duration="1500">Assembly Language</li>
-            <li data-aos="zoom-in-left" data-aos-duration="1500">Embedded C</li>
-            <li data-aos="zoom-out-right" data-aos-duration="1500">C++</li>
-            <li data-aos="zoom-in" data-aos-duration="1500">Matlab</li>
-            <li data-aos="zoom-out-left" data-aos-duration="1500">Simulink</li>
-            <li data-aos="zoom-out-up" data-aos-duration="1500">Machine Learning</li>
-            <li data-aos="fade-down-left" data-aos-duration="1500">GNU Octave</li>
-            <li data-aos="fade-down-left" data-aos-duration="1500">Proteus</li>
-            <li data-aos="fade-right" data-aos-duration="1500">Eagle</li>
-            <li data-aos="fade-up" data-aos-duration="1500">PLC</li>
-            <li data-aos="fade-up-left" data-aos-duration="1500">RSLogix</li>
-            <li data-aos="fade-left" data-aos-duration="1500">SCADA</li>
-            <li data-aos="fade-down-right" data-aos-duration="1500">RS View 32</li>
-            <li data-aos="fade-right" data-aos-duration="1500">VHDL</li>
-            <li data-aos="zoom-in-down" data-aos-duration="1500">Quartus</li>
-            <li data-aos="zoom-in-down" data-aos-duration="1500">ModelSim</li>
-            <li data-aos="zoom-out-down" data-aos-duration="1500">Latex</li>
-            <li data-aos="zoom-in-left" data-aos-duration="1500">Python</li>
-            <li data-aos="fade-right" data-aos-duration="1500">Shell Scripting</li>
-            <li data-aos="fade-up" data-aos-duration="1500">CUDA</li>
-            <li data-aos="fade-up-left" data-aos-duration="1500">OpenMP</li>
-            <li data-aos="fade-left" data-aos-duration="1500">MPI</li>
-            <li data-aos="fade-down-right" data-aos-duration="1500">OpenCL</li>
-            <li data-aos="zoom-out-right" data-aos-duration="1500">Linux</li>
-            <li data-aos="zoom-out-up" data-aos-duration="1500">Git</li>
-            <li data-aos="zoom-in-up" data-aos-duration="1500">Image Processing</li>
-            <li data-aos="fade-down-right" data-aos-duration="1500">HTML</li>
-            <li data-aos="fade-up-right" data-aos-duration="1500">CSS</li>
-            <li data-aos="fade-left" data-aos-duration="1500">Bootstrap</li>
-            <li data-aos="fade-down-left" data-aos-duration="1500">Javascript</li>
+        <span class="skill-category">Programming & Tools</span>
+        <ul>
+            <li data-aos="fade-up" data-aos-duration="800">Python</li>
+            <li data-aos="fade-up" data-aos-duration="900">C++</li>
+            <li data-aos="fade-up" data-aos-duration="1000">CUDA</li>
+            <li data-aos="fade-up" data-aos-duration="1100">VHDL</li>
+            <li data-aos="fade-up" data-aos-duration="1200">Shell Scripting</li>
+            <li data-aos="fade-up" data-aos-duration="800">Git</li>
+            <li data-aos="fade-up" data-aos-duration="900">Linux</li>
+            <li data-aos="fade-up" data-aos-duration="1000">MLflow</li>
+            <li data-aos="fade-up" data-aos-duration="1100">Gradio</li>
+            <li data-aos="fade-up" data-aos-duration="1200">MATLAB</li>
+        </ul>
 
+        <span class="skill-category">Domains</span>
+        <ul>
+            <li data-aos="zoom-in" data-aos-duration="800">AR/VR Systems</li>
+            <li data-aos="zoom-in" data-aos-duration="900">Object Detection</li>
+            <li data-aos="zoom-in" data-aos-duration="1000">Action Recognition</li>
+            <li data-aos="zoom-in" data-aos-duration="1100">HOI Detection</li>
+            <li data-aos="zoom-in" data-aos-duration="1200">Eye Tracking</li>
+            <li data-aos="zoom-in" data-aos-duration="800">Super Resolution</li>
+            <li data-aos="zoom-in" data-aos-duration="900">Image Segmentation</li>
+            <li data-aos="zoom-in" data-aos-duration="1000">FPGA Design</li>
+            <li data-aos="zoom-in" data-aos-duration="1100">Foveated Rendering</li>
+            <li data-aos="zoom-in" data-aos-duration="1200">Real-Time Inference</li>
         </ul>
     </div>
     <!-- End #skills -->
@@ -678,7 +622,7 @@
             <div class="row">
                 <div class="col-sm-5 copyright">
                     <p>
-                        Copyright &copy; 2018 SOURABH SURI
+                        Copyright &copy; 2025 Sourabh Suri
                     </p>
                 </div>
                 <div class="col-sm-2 top">
@@ -692,13 +636,10 @@
                             <a href="https://github.com/sourabh-suri" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
                         </li>
                         <li>
-                            <a href="https://www.instagram.com/surisourabh" target="_blank"><i class="fa fa-instagram" aria-hidden="true"></i></a>
-                        </li>
-                        <li>
                             <a href="https://linkedin.com/in/sourabh-suri-bb4436a4" target="_blank"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
                         </li>
                         <li>
-                            <a href="https://www.facebook.com/sourabh.suri.56" target="_blank"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+                            <a href="https://www.instagram.com/surisourabh" target="_blank"><i class="fa fa-instagram" aria-hidden="true"></i></a>
                         </li>
                         <li>
                             <a href="https://twitter.com/101sourabh" target="_blank"><i class="fa fa-twitter" aria-hidden="true"></i></a>
@@ -712,11 +653,10 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="js/scripts.min.js"></script>
-	<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-	<script>
-		AOS.init();
-	</script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
 </body>
 
 </html>
-
