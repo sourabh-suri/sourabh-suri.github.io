@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sourabh Suri - Resume</title>
+    <!--
+        HOW TO EXPORT AS PDF:
+        1. Open this file in Chrome or Edge
+        2. Press Ctrl+P (Print)
+        3. Set Destination: "Save as PDF"
+        4. Set Layout: Portrait
+        5. Set Margins: None (or Minimum)
+        6. Enable "Background graphics" checkbox
+        7. Click Save
+
+        To edit: just open this file in any text editor (VS Code, Notepad++, etc.)
+    -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: #2d2d2d;
+            line-height: 1.42;
+            font-size: 9.5pt;
+            background: #f5f5f5;
+        }
+
+        .page {
+            max-width: 210mm;
+            margin: 10px auto;
+            padding: 14mm 16mm;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+
+        a { color: #8B4513; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* ── Header ── */
+        .header {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2.5px solid #8B4513;
+            margin-bottom: 10px;
+        }
+
+        .photo {
+            width: 82px;
+            height: 102px;
+            object-fit: cover;
+            border: none;
+            flex-shrink: 0;
+        }
+
+        .header-info { flex: 1; }
+
+        .name {
+            font-size: 26pt;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            line-height: 1.1;
+        }
+        .name .accent { color: #8B4513; }
+
+        .tagline {
+            font-size: 10.5pt;
+            color: #555;
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        .contact-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 16px;
+            margin-top: 6px;
+            font-size: 9pt;
+            color: #444;
+        }
+
+        /* ── Section headings ── */
+        h2 {
+            font-size: 10.5pt;
+            color: #8B4513;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #d0c4b8;
+            padding-bottom: 2px;
+            margin: 11px 0 6px 0;
+            font-weight: 700;
+        }
+
+        /* ── Professional Summary ── */
+        .summary {
+            font-size: 9.2pt;
+            color: #3a3a3a;
+            line-height: 1.5;
+        }
+
+        /* ── Skills grid ── */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 105px 1fr;
+            gap: 2px 10px;
+            font-size: 9.2pt;
+        }
+        .skills-grid .label {
+            font-weight: 600;
+            color: #555;
+            padding: 1px 0;
+        }
+        .skills-grid .value {
+            padding: 1px 0;
+        }
+
+        /* ── Job entries ── */
+        .job { margin-bottom: 6px; }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+
+        .job-title {
+            font-weight: 700;
+            font-size: 10pt;
+        }
+        .role { color: #8B4513; }
+
+        .job-date {
+            font-style: italic;
+            font-size: 8.5pt;
+            color: #777;
+            white-space: nowrap;
+        }
+
+        .job ul, .project ul, .achievements, .leadership ul {
+            padding-left: 15px;
+            margin-top: 3px;
+        }
+
+        .job li {
+            margin-bottom: 4px;
+            font-size: 9.1pt;
+            line-height: 1.42;
+        }
+
+        .job li strong { color: #2d2d2d; }
+
+        .year-tag {
+            font-size: 7.5pt;
+            color: #999;
+            font-style: italic;
+            margin-left: 2px;
+        }
+
+        /* ── FY26 focus area ── */
+        .job li ul {
+            margin-top: 2px;
+            padding-left: 14px;
+            list-style-type: disc;
+        }
+        .job li ul li {
+            font-size: 8.8pt;
+            margin-bottom: 2px;
+        }
+
+        /* ── Education table ── */
+        .edu-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9.2pt;
+            margin-top: 2px;
+        }
+        .edu-table th {
+            text-align: left;
+            color: #8B4513;
+            font-size: 8.5pt;
+            padding: 2px 6px 2px 0;
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+        }
+        .edu-table td {
+            padding: 3px 6px 3px 0;
+        }
+
+        /* ── Achievements ── */
+        .achievements li {
+            margin-bottom: 2px;
+            font-size: 9.1pt;
+        }
+
+        /* ── Projects ── */
+        .project { margin-bottom: 5px; }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+
+        .project-title {
+            font-weight: 700;
+            font-size: 9.5pt;
+        }
+
+        .project-sub {
+            font-size: 8.5pt;
+            color: #666;
+            font-style: italic;
+        }
+
+        .project li {
+            font-size: 8.8pt;
+            margin-bottom: 1px;
+            line-height: 1.38;
+        }
+
+        /* ── Leadership ── */
+        .leadership-entry { margin-bottom: 4px; }
+
+        .leadership-entry .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .leadership li {
+            font-size: 8.8pt;
+            margin-bottom: 1px;
+            line-height: 1.38;
+        }
+
+        /* ── Print styles ── */
+        @media print {
+            body { background: none; font-size: 9.2pt; }
+            .page {
+                max-width: none;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+            @page {
+                size: A4;
+                margin: 12mm 14mm;
+            }
+            h2 { margin-top: 9px; }
+            .job li { font-size: 8.8pt; }
+            .job { page-break-inside: avoid; }
+            .project { page-break-inside: avoid; }
+            a { color: #8B4513; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- ════════════ HEADER ════════════ -->
+    <div class="header">
+        <img src="mypic.PNG" alt="Sourabh Suri" class="photo">
+        <div class="header-info">
+            <div class="name">Sourabh <span class="accent">Suri</span></div>
+            <div class="tagline">AR/VR Computer Vision Engineer | Sony Corporation, Tokyo</div>
+            <div class="contact-row">
+                <span>sourabh.sgc@gmail.com</span>
+                <span>+81-080-7667-1994</span>
+                <span><a href="https://sourabh-suri.github.io">sourabh-suri.github.io</a></span>
+                <span>DOB: 12 Nov 1994</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════ PROFESSIONAL SUMMARY ════════════ -->
+    <h2>Professional Summary</h2>
+    <p class="summary">
+        <strong>Computer Vision and Deep Learning Engineer</strong> with <strong>4+ years at Sony
+        Corporation</strong>, building real-time AI that ships in <strong>AR/VR headsets</strong>,
+        <strong>manufacturing lines</strong>, and <strong>retail venues</strong>. Proven track record
+        delivering <strong>end-to-end ML pipelines</strong> from synthetic data generation to edge
+        deployment across <strong>HOI detection</strong>, <strong>action recognition</strong>,
+        <strong>eye-tracking</strong>, and <strong>super-resolution</strong>. Currently driving
+        <strong>LLM-integrated automation</strong> for scalable recognition across XR training and
+        entertainment.
+    </p>
+
+    <!-- ════════════ WORK EXPERIENCE ════════════ -->
+    <h2>Work Experience</h2>
+
+    <!-- Sony -->
+    <div class="job">
+        <div class="job-header">
+            <div class="job-title"><span class="role">AR/VR System Engineer</span> &nbsp;|&nbsp; Sony Corporation, Tokyo, Japan</div>
+            <div class="job-date">Oct 2021 &ndash; Present</div>
+        </div>
+        <ul>
+            <li>
+                <strong>Current R&amp;D Focus (FY26):</strong>
+                Leading scalable AI deployment across <strong>LBE</strong> (MR interactions, VTuber NPC,
+                IP promotions) and <strong>XR Training</strong> (construction sites, factories):
+                <ul>
+                    <li><strong>Decoupled HOI auto-annotation</strong> with independent object/interaction scaling, targeting <strong>100% annotation time reduction</strong></li>
+                    <li><strong>Automated PDCA accuracy loop</strong> (evaluate &rarr; analyze &rarr; retrain) maintaining <strong>&ge;90%</strong> without intervention</li>
+                    <li><strong>LLM-powered recognition auto-generation</strong> from site descriptions, enabling action definitions <strong>within one day</strong></li>
+                </ul>
+            </li>
+            <li>
+                <strong>Real-Time HOI Detection Platform:</strong>
+                Built a real-time <strong>Human-Object Interaction</strong> detection platform for
+                <strong>location-based entertainment</strong>, detecting customer interactions with in-store
+                merchandise and triggering <strong>product-exclusive audio feedback</strong> for immersive
+                experience. Engineered <strong>pipelined inference</strong> (TIGER&nbsp;+ YOLOX&nbsp;+
+                S3D) at <strong>15&nbsp;fps</strong>, developed <strong>auto-annotation pipeline</strong>
+                (SAM3&nbsp;&rarr; HOISTFormer&nbsp;&rarr; DEIMv2) with <strong>Gradio</strong> UI for
+                domain adaptation from <strong>~360&nbsp;videos</strong>, and demonstrated
+                <strong>16&times; lighter model</strong> matching large stack at <strong>98.8% accuracy</strong>
+                <span class="year-tag">'25</span>
+            </li>
+            <li>
+                <strong>Production Line Action Recognition &amp; Cost Optimization:</strong>
+                Developed <strong>automated quality assurance</strong> for manufacturing lines, recognizing
+                worker actions, converting to <strong>process steps</strong>, and flagging incorrect sequences
+                in <strong>real-time within 3&nbsp;seconds</strong> for <strong>automated debugging</strong>.
+                Achieved <strong>97.9% accuracy</strong> on <strong>1,000 real production videos</strong>
+                using <strong>ActionFormer</strong>, <strong>YOLOX</strong>, <strong>Meta&nbsp;GNN</strong>,
+                and <strong>label encoding</strong>; recovered a critically degraded pipeline to
+                <strong>near-perfect accuracy</strong> through systematic root-cause debugging. Scaled to
+                <strong>4&times; concurrent stations</strong> on single GPU, reducing equipment cost
+                toward <strong>&le;&yen;250K</strong> per station
+                <span class="year-tag">'25</span>
+            </li>
+            <li>
+                <strong>Image Resolution Enhancement:</strong>
+                Led evaluation and integration of <strong>Image Resolution Enhancement</strong> including
+                rule-based &amp; ML algorithms, defined objective metrics, conducted large-scale
+                <strong>benchmarks</strong>, improved model accuracy and latency trade-offs, increased
+                eye-sight by <strong>2&times;</strong>, and secured <strong>intellectual property</strong>
+                <span class="year-tag">'25</span>
+            </li>
+            <li>
+                <strong>Eye-Tracking Pipeline:</strong>
+                Implemented a high-performance <strong>Eye-tracking Pipeline</strong> using deep learning
+                models, generated synthetic datasets, trained and optimized for mobile SoCs, achieved
+                <strong>low-latency gaze recognition</strong> through subject segmentation &amp; feature
+                detection ML algorithm for <strong>foveated rendering</strong> in XR&nbsp;HMDs
+                <span class="year-tag">'24</span>
+            </li>
+            <li>
+                <strong>Occlusion Algorithm:</strong>
+                Designed and deployed <strong>Occlusion Algorithm</strong> for XR&nbsp;HMDs, combining
+                <strong>deep learning segmentation</strong> with rule-based <strong>computer vision depth
+                estimation</strong>, integrated with <strong>OpenXR/OpenGL&nbsp;ES</strong> graphics, and
+                leveraged <strong>LLMs</strong> for rapid prototyping and code generation to deliver
+                immersive wearable experience
+                <span class="year-tag">'23</span>
+            </li>
+            <li>
+                <strong>FPGA-Accelerated Distortion Correction:</strong>
+                Developed an FPGA-accelerated <strong>Distortion Correction</strong> CV pipeline, delivered
+                <strong>60&nbsp;FPS XR rendering at 200&nbsp;MHz</strong> with <strong>60% lower power</strong>
+                than GPU baselines, and enabled <strong>ultra-low latency</strong> vision workloads in
+                Video See-Through Head-Mounted Display systems
+                <span class="year-tag">'22</span>
+            </li>
+            <li>
+                <strong>Multi-Camera CV Capture System:</strong>
+                Engineered a multi-camera <strong>Computer Vision Capture System</strong> with FPGA
+                <strong>RTL and firmware</strong>, synchronized <strong>15&times; IMX418 cameras each
+                running at 60&nbsp;FPS for 4K OLED display</strong>, and integrated CV pipelines with
+                the software stack for <strong>real-time XR virtual production</strong>
+                <span class="year-tag">'21</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Past roles -->
+    <div class="job">
+        <div class="job-header">
+            <div class="job-title"><span class="role">Business Analyst</span> &nbsp;|&nbsp; PBOPlus Consulting Services Pvt. Ltd.</div>
+            <div class="job-date">May 2018 &ndash; Jul 2018</div>
+        </div>
+        <ul>
+            <li>Analyzed <strong>business processes</strong> to identify <strong>non-value adding</strong> components; designed <strong>management information system</strong></li>
+            <li><strong>Quantified</strong> and <strong>standardized</strong> product quality for <strong>process automation</strong> of production &amp; comparison</li>
+        </ul>
+    </div>
+
+    <div class="job">
+        <div class="job-header">
+            <div class="job-title"><span class="role">Associate Patent Engineer</span> &nbsp;|&nbsp; UnitedLex Corporation</div>
+            <div class="job-date">Jul 2017 &ndash; Oct 2017</div>
+        </div>
+        <ul>
+            <li>Performed <strong>infringement analysis</strong> and <strong>prior art searches</strong> for patent assets owned by <strong>Fortune&nbsp;500</strong> clients</li>
+            <li>Contributed to <strong>patent litigation</strong> cases resulting in cost savings of <strong>USD&nbsp;0.5&ndash;0.75M</strong></li>
+        </ul>
+    </div>
+
+    <div class="job">
+        <div class="job-header">
+            <div class="job-title"><span class="role">Intern</span> &nbsp;|&nbsp; Laser Science &amp; Technology Centre, DRDO</div>
+            <div class="job-date">Jun 2016 &ndash; Jul 2016</div>
+        </div>
+        <ul>
+            <li>Designed a <strong>control system</strong> for <strong>gimbal assembly</strong> tracking with high <strong>accuracy</strong> and rapid response for <strong>defense optics</strong></li>
+        </ul>
+    </div>
+
+    <!-- ════════════ TECHNICAL SKILLS ════════════ -->
+    <h2>Technical Skills</h2>
+    <div class="skills-grid">
+        <span class="label">Languages</span>
+        <span class="value">Python, C, C++, CUDA, Embedded C, Verilog, VHDL</span>
+
+        <span class="label">ML / CV</span>
+        <span class="value">PyTorch, OpenCV, MLflow, Gradio, MATLAB</span>
+
+        <span class="label">Architectures</span>
+        <span class="value">YOLOX, DEIMv2, EfficientNet, GNN, S3D, SAM, ActionFormer, TIGER, HOISTFormer</span>
+
+        <span class="label">XR / Graphics</span>
+        <span class="value">OpenXR, OpenGL ES, Android XR, Unreal Engine, Unity, Blender</span>
+
+        <span class="label">Hardware</span>
+        <span class="value">NVIDIA GPUs (RTX 4090 / 3090), Xilinx VIVADO / VITIS, Intel Quartus, Jetson</span>
+
+        <span class="label">Domains</span>
+        <span class="value">Computer Vision, Deep Learning, Object Detection, Action Recognition, HOI Detection, Image Segmentation, Eye Tracking, AR/VR, Real-Time Systems, Edge Deployment, Model Optimization, LLM Integration</span>
+    </div>
+
+    <!-- ════════════ EDUCATION ════════════ -->
+    <h2>Education</h2>
+    <table class="edu-table">
+        <thead>
+            <tr>
+                <th>Degree</th>
+                <th>Institute</th>
+                <th>Specialization</th>
+                <th>CPI / %</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>M.Tech, 2021</td>
+                <td>Indian Institute of Technology, Bombay</td>
+                <td>Power Electronics &amp; Power Systems</td>
+                <td><strong>9.9 / 10</strong></td>
+            </tr>
+            <tr>
+                <td>B.Tech, 2017</td>
+                <td>Delhi Technological University</td>
+                <td>Electrical &amp; Electronics Engineering</td>
+                <td>80.14%</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ════════════ SCHOLASTIC ACHIEVEMENTS ════════════ -->
+    <h2>Scholastic Achievements</h2>
+    <ul class="achievements">
+        <li>Secured <strong>First Rank</strong> in Power Electronics &amp; Power Systems, Electrical Dept., IIT Bombay <em>(2021)</em></li>
+        <li>Qualified <strong>GATE</strong> in EE with <strong>98th percentile</strong> among 121,000+ candidates <em>(2018)</em></li>
+        <li>Awarded <strong>Overall Topper of the Batch</strong> for Intellectual Property Rights training at UnitedLex <em>(2017)</em></li>
+        <li>Top <strong>1.14 percentile</strong> among 1.4 million candidates in Joint Entrance Examination (JEE) <em>(2013)</em></li>
+    </ul>
+
+    <!-- ════════════ KEY ACADEMIC PROJECTS ════════════ -->
+    <h2>Key Academic Projects</h2>
+
+    <div class="project">
+        <div class="project-header">
+            <span class="project-title">Electrical Impedance 3D Tomography Medical Imaging with Neural Networks</span>
+            <span class="job-date">Jan &ndash; Jul 2021</span>
+        </div>
+        <div class="project-sub">M.Tech Thesis &nbsp;|&nbsp; Guide: Prof. Maryam Shojaei Baghini, IIT Bombay</div>
+        <ul>
+            <li>Developed NN-based prediction algorithm for non-invasive, non-radiant EIT medical imaging for continuous ventilation monitoring</li>
+            <li>Improved resolution and SNR by <strong>43% lower MSE</strong> over conventional Gauss-Newton method; optimized with bit quantization and multiplier-less arithmetic</li>
+        </ul>
+    </div>
+
+    <div class="project">
+        <div class="project-header">
+            <span class="project-title">Classification of KYC Documents and OCR Extraction using ML</span>
+            <span class="job-date">Mar &ndash; Jun 2020</span>
+        </div>
+        <div class="project-sub">Intern Project &nbsp;|&nbsp; Arthimpact Digital Loan Pvt. Ltd.</div>
+        <ul>
+            <li>Trained YOLO&nbsp;V3 object detection model for document classification achieving <strong>99% mAP</strong>; integrated Py-tesseract OCR for automated text extraction</li>
+        </ul>
+    </div>
+
+    <div class="project">
+        <div class="project-header">
+            <span class="project-title">Acceleration of Image Color Quantization Using K-means Clustering</span>
+            <span class="job-date">Apr &ndash; May 2021</span>
+        </div>
+        <div class="project-sub">High Performance Computing &nbsp;|&nbsp; IIT Bombay</div>
+        <ul>
+            <li>Parallelized K-means image compression using OpenCV, C++, OpenMP (<strong>2.9x speedup</strong>) and NVIDIA CUDA kernels (<strong>39x speedup</strong> over sequential C++)</li>
+        </ul>
+    </div>
+
+    <!-- ════════════ LEADERSHIP ════════════ -->
+    <h2>Leadership &amp; Responsibility</h2>
+
+    <div class="leadership">
+        <div class="leadership-entry">
+            <div class="entry-header">
+                <span class="project-title"><span class="role">Company Coordinator</span> &nbsp;|&nbsp; Institute Placement Team, IIT Bombay</span>
+                <span class="job-date">Apr 2019 &ndash; Jun 2020</span>
+            </div>
+            <ul>
+                <li>Managed on-campus assessments and career fair for <strong>1,750+ students</strong>; trained 140+ coordinators to streamline 6,000+ interviews across 250+ firms</li>
+                <li>Sole point of contact for international recruiters, resulting in <strong>75% rise</strong> in international offers; awarded for special invaluable contribution</li>
+            </ul>
+        </div>
+
+        <div class="leadership-entry">
+            <div class="entry-header">
+                <span class="project-title"><span class="role">Research Assistant</span> &nbsp;|&nbsp; Wadhwani Electronics Lab, IIT Bombay</span>
+                <span class="job-date">Jul 2018 &ndash; Jul 2021</span>
+            </div>
+            <ul>
+                <li>Mentored undergraduate students for Microprocessors Lab and Analog Circuits Lab; designed SPI-based DAC experiment for ADSR envelope generation</li>
+            </ul>
+        </div>
+    </div>
+
+</div><!-- /.page -->
+</body>
+</html>
