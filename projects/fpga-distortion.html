@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FPGA-Accelerated Distortion Correction | Sourabh Suri</title>
+<meta name="description" content="Hardware-accelerated lens distortion correction module for XR headsets. Pipelined FPGA architecture at 200 MHz delivering 60 FPS with 60% lower power.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ========================================
+   Custom Properties
+   ======================================== */
+:root {
+  --bg-base: #0a0a0f;
+  --bg-card: rgba(15, 15, 25, 0.6);
+  --bg-glass: rgba(255, 255, 255, 0.04);
+  --bg-glass-hover: rgba(255, 255, 255, 0.08);
+  --accent: #00d4ff;
+  --accent-dim: rgba(0, 212, 255, 0.15);
+  --accent-glow: rgba(0, 212, 255, 0.4);
+  --accent-purple: #a855f7;
+  --accent-purple-dim: rgba(168, 85, 247, 0.15);
+  --text-primary: #e8e8f0;
+  --text-secondary: #8888a0;
+  --text-dim: #555570;
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glass-hover: rgba(0, 212, 255, 0.2);
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --glass-blur: 20px;
+  --radius: 16px;
+  --radius-sm: 8px;
+  --max-width: 1100px;
+}
+
+/* ========================================
+   Reset & Base
+   ======================================== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-dim) var(--bg-base);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 3px; }
+
+a { color: var(--accent); text-decoration: none; transition: color 0.3s; }
+a:hover { color: #66e5ff; }
+
+img { max-width: 100%; display: block; }
+
+/* ========================================
+   Background Effects
+   ======================================== */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+.bg-glow-1, .bg-glow-2 {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-glow-1 {
+  width: 600px; height: 600px;
+  top: -200px; right: -150px;
+  background: rgba(0, 212, 255, 0.06);
+}
+
+.bg-glow-2 {
+  width: 500px; height: 500px;
+  bottom: -100px; left: -200px;
+  background: rgba(168, 85, 247, 0.04);
+}
+
+/* ========================================
+   Back Navigation
+   ======================================== */
+.back-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 20px 40px;
+  background: rgba(10, 10, 15, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-glass);
+  transition: transform 0.3s ease;
+}
+
+.back-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  transition: color 0.3s, transform 0.3s;
+}
+
+.back-nav a:hover {
+  color: var(--accent);
+  transform: translateX(-4px);
+}
+
+.back-nav a svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s;
+}
+
+.back-nav a:hover svg {
+  transform: translateX(-3px);
+}
+
+/* ========================================
+   Main Content Wrapper
+   ======================================== */
+.page-content {
+  position: relative;
+  z-index: 1;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ========================================
+   Hero Section
+   ======================================== */
+.hero {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 100px;
+  padding-bottom: 60px;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 100px;
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  width: fit-content;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.6s ease forwards 0.2s;
+}
+
+.hero-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeUp 0.7s ease forwards 0.35s;
+}
+
+.hero h1 .accent-text {
+  background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+  margin-bottom: 32px;
+  max-width: 650px;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeUp 0.7s ease forwards 0.5s;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.6s ease forwards 0.65s;
+}
+
+.hero-tag {
+  padding: 6px 16px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 100px;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.3s;
+}
+
+.hero-tag:hover {
+  background: var(--accent-dim);
+  border-color: rgba(0, 212, 255, 0.3);
+  color: var(--accent);
+}
+
+.hero-tag.highlight {
+  background: var(--accent-dim);
+  border-color: rgba(0, 212, 255, 0.25);
+  color: var(--accent);
+}
+
+/* ========================================
+   Section Styling
+   ======================================== */
+.section {
+  padding: 80px 0;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.section-label::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+}
+
+.section h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.section-text {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 800px;
+}
+
+/* ========================================
+   Glass Cards
+   ======================================== */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  padding: 32px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.03) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.glass-card:hover {
+  border-color: var(--border-glass-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 212, 255, 0.05);
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+/* ========================================
+   Full-Width Image Sections
+   ======================================== */
+.image-showcase {
+  margin: 40px -32px;
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.image-showcase img {
+  width: 100%;
+  display: block;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-glass);
+}
+
+.image-glow {
+  position: relative;
+}
+
+.image-glow::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  left: 10%;
+  right: 10%;
+  height: 80px;
+  background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.15) 0%, transparent 70%);
+  filter: blur(30px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.image-caption {
+  padding: 16px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-style: italic;
+  text-align: center;
+}
+
+/* ========================================
+   Pipeline Visualization
+   ======================================== */
+.pipeline-flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  padding: 24px 0;
+  overflow-x: auto;
+}
+
+.pipeline-node {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.pipeline-block {
+  padding: 10px 18px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+.pipeline-block.fpga {
+  background: var(--accent-dim);
+  border-color: rgba(0, 212, 255, 0.3);
+  color: var(--accent);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+}
+
+.pipeline-arrow {
+  color: var(--text-dim);
+  padding: 0 8px;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   Pipeline Stages (Algorithm)
+   ======================================== */
+.stages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.stage-card {
+  padding: 20px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  position: relative;
+  transition: all 0.3s;
+}
+
+.stage-card:hover {
+  border-color: var(--border-glass-hover);
+  background: var(--bg-glass-hover);
+}
+
+.stage-number {
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.stage-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ========================================
+   Spec Table
+   ======================================== */
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.spec-item {
+  padding: 20px 24px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  transition: all 0.3s;
+}
+
+.spec-item:hover {
+  border-color: var(--border-glass-hover);
+}
+
+.spec-label {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.spec-value {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ========================================
+   Step List
+   ======================================== */
+.steps-list {
+  list-style: none;
+  counter-reset: step-counter;
+  margin: 24px 0;
+}
+
+.steps-list li {
+  counter-increment: step-counter;
+  padding: 16px 16px 16px 56px;
+  position: relative;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  border-left: 1px solid var(--border-glass);
+  margin-left: 16px;
+  transition: all 0.3s;
+}
+
+.steps-list li:hover {
+  color: var(--text-primary);
+  border-left-color: var(--accent-dim);
+}
+
+.steps-list li::before {
+  content: counter(step-counter);
+  position: absolute;
+  left: -17px;
+  top: 14px;
+  width: 32px;
+  height: 32px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-glass);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.steps-list li:hover::before {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
+}
+
+/* ========================================
+   Results Section
+   ======================================== */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin: 32px 0;
+}
+
+.result-card {
+  padding: 32px 24px;
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s;
+}
+
+.result-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.result-card:hover {
+  border-color: var(--border-glass-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 212, 255, 0.08);
+}
+
+.result-card:hover::before {
+  opacity: 1;
+}
+
+.result-value {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), #66e5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.result-label {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ========================================
+   Bullet List
+   ======================================== */
+.detail-list {
+  list-style: none;
+  margin: 16px 0;
+}
+
+.detail-list li {
+  padding: 8px 0 8px 24px;
+  position: relative;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.detail-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 16px;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--accent);
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+/* ========================================
+   Divider
+   ======================================== */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-glass), transparent);
+  margin: 0;
+}
+
+/* ========================================
+   Scroll Animations
+   ======================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+.page-footer {
+  padding: 60px 0 40px;
+  text-align: center;
+  border-top: 1px solid var(--border-glass);
+}
+
+.page-footer p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 768px) {
+  .page-content {
+    padding: 0 20px;
+  }
+
+  .back-nav {
+    padding: 16px 20px;
+  }
+
+  .hero {
+    min-height: 50vh;
+    padding-top: 80px;
+    padding-bottom: 40px;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .section {
+    padding: 50px 0;
+  }
+
+  .glass-card {
+    padding: 24px;
+  }
+
+  .image-showcase {
+    margin: 24px -20px;
+  }
+
+  .pipeline-flow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .pipeline-arrow {
+    transform: rotate(90deg);
+    padding: 4px 0;
+  }
+
+  .stages-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .results-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .spec-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .steps-list li {
+    padding-left: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spec-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Background Effects -->
+<div class="bg-grid"></div>
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
+
+<!-- Back Navigation -->
+<nav class="back-nav">
+  <a href="../index.html#projects">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    Back to Portfolio
+  </a>
+</nav>
+
+<div class="page-content">
+
+  <!-- ==================== HERO ==================== -->
+  <section class="hero">
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+        <path d="M12 12h.01"></path>
+        <path d="M17 12h.01"></path>
+        <path d="M7 12h.01"></path>
+      </svg>
+      Sony Corporation
+    </div>
+    <h1>FPGA-Accelerated<br><span class="accent-text">Distortion Correction</span></h1>
+    <p class="hero-subtitle">Hardware-Accelerated Lens Correction for XR Headsets</p>
+    <div class="hero-tags">
+      <span class="hero-tag highlight">FPGA</span>
+      <span class="hero-tag highlight">VHDL</span>
+      <span class="hero-tag">200 MHz</span>
+      <span class="hero-tag">60 FPS</span>
+      <span class="hero-tag">Low Power</span>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ==================== OVERVIEW ==================== -->
+  <section class="section reveal">
+    <span class="section-label">Overview</span>
+    <h2>Real-Time Lens Correction for Wearable XR</h2>
+    <p class="section-text">
+      Hardware-accelerated lens distortion correction module for XR headsets. This project involved designing a
+      pipelined FPGA architecture operating at 200 MHz to deliver 60 FPS correction with 60% lower power draw
+      compared to GPU-based approaches &mdash; critical for battery-powered wearable devices.
+    </p>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ==================== SYSTEM ARCHITECTURE ==================== -->
+  <section class="section">
+    <div class="reveal">
+      <span class="section-label">System Architecture</span>
+      <h2>VST Camera Pipeline</h2>
+    </div>
+
+    <div class="image-showcase image-glow reveal reveal-delay-1">
+      <img src="../images/slide6_img26.png" alt="System architecture diagram showing the VST camera pipeline from lenses through FPGA processing to head-mounted display" loading="lazy">
+      <p class="image-caption">Full VST camera pipeline: Lenses &rarr; Image Sensor &rarr; FPGA Processing &rarr; Display</p>
+    </div>
+
+    <div class="reveal reveal-delay-2">
+      <div class="pipeline-flow">
+        <div class="pipeline-node">
+          <span class="pipeline-block">Lenses</span>
+          <span class="pipeline-arrow">&rarr;</span>
+        </div>
+        <div class="pipeline-node">
+          <span class="pipeline-block">Image Sensor (IMX477)</span>
+          <span class="pipeline-arrow">&rarr;</span>
+        </div>
+        <div class="pipeline-node">
+          <span class="pipeline-block fpga">FPGA: Un-distortion</span>
+          <span class="pipeline-arrow">&rarr;</span>
+        </div>
+        <div class="pipeline-node">
+          <span class="pipeline-block fpga">PC Graphics</span>
+          <span class="pipeline-arrow">&rarr;</span>
+        </div>
+        <div class="pipeline-node">
+          <span class="pipeline-block fpga">Inverse Distortion</span>
+          <span class="pipeline-arrow">&rarr;</span>
+        </div>
+        <div class="pipeline-node">
+          <span class="pipeline-block">4K M-OLED (ECX344)</span>
+          <span class="pipeline-arrow">&rarr;</span>
+        </div>
+        <div class="pipeline-node">
+          <span class="pipeline-block">Lenses</span>
+          <span class="pipeline-arrow">&rarr;</span>
+        </div>
+        <div class="pipeline-node">
+          <span class="pipeline-block">HMD</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card reveal reveal-delay-3" style="margin-top: 32px;">
+      <ul class="detail-list">
+        <li>High throughput and low-latency distortion correction is required to achieve video see-through over 60 FPS</li>
+        <li>Scope of Interest: 4K Image (3840&times;2160) &rarr; Distortion Correction Filter &rarr; Corrected Image</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ==================== ALGORITHM DESIGN ==================== -->
+  <section class="section">
+    <div class="reveal">
+      <span class="section-label">Algorithm Design</span>
+      <h2>8-Stage Pipelined Architecture</h2>
+    </div>
+
+    <div class="image-showcase image-glow reveal reveal-delay-1">
+      <img src="../images/slide6_img27.png" alt="FPGA algorithm block diagram showing the 8-stage pipeline design for distortion correction" loading="lazy">
+      <p class="image-caption">FPGA-based distortion correction filter with pipelined processing stages</p>
+    </div>
+
+    <div class="glass-card reveal reveal-delay-2" style="margin-top: 32px;">
+      <ul class="detail-list">
+        <li>Distortion Correction Logic with polynomial equations</li>
+        <li>RAM Buffer for input/output data management</li>
+        <li>Calculate Pv block for pixel coordinate transformation</li>
+        <li>Output FIFO for synchronized data output</li>
+        <li>Rule of thumb: Computation time between two pipeline stages should be less than 1 clock cycle (200 MHz)</li>
+      </ul>
+    </div>
+
+    <div class="reveal reveal-delay-3">
+      <h3 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600; margin: 32px 0 16px; color: var(--text-primary);">Pipeline Stages</h3>
+      <div class="stages-grid">
+        <div class="stage-card">
+          <div class="stage-number">Stage 1</div>
+          <div class="stage-desc">Coordinate calculation</div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-number">Stage 2&ndash;3</div>
+          <div class="stage-desc">Radius and polynomial computation</div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-number">Stage 4</div>
+          <div class="stage-desc">Distorted coordinate mapping</div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-number">Stage 5</div>
+          <div class="stage-desc">Read neighbor pixels from BRAM</div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-number">Stage 6&ndash;7</div>
+          <div class="stage-desc">Bilinear interpolation coefficients</div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-number">Stage 8</div>
+          <div class="stage-desc">Write corrected pixel to output</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ==================== FPGA IMPLEMENTATION ==================== -->
+  <section class="section">
+    <div class="reveal">
+      <span class="section-label">FPGA Implementation</span>
+      <h2>VCU118 Development Platform</h2>
+    </div>
+
+    <div class="image-showcase image-glow reveal reveal-delay-1">
+      <img src="../images/slide6_img28.png" alt="FPGA implementation block diagram showing MicroBlaze processor, AXI interconnect, and distortion correction blocks" loading="lazy">
+      <p class="image-caption">Block diagram: MicroBlaze Processor &rarr; AXI Interconnect &rarr; DDR/UART/DMA &rarr; Distortion Correction</p>
+    </div>
+
+    <div class="glass-card reveal reveal-delay-2" style="margin-top: 32px;">
+      <h3 style="font-family: var(--font-heading); font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: var(--accent);">FPGA Specifications</h3>
+      <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 16px;">
+        <strong style="color: var(--text-primary);">Board:</strong> VCU118 (Virtex UltraScale+ XCVU9P-L2FLGA2104E)
+      </p>
+      <div class="spec-grid">
+        <div class="spec-item">
+          <div class="spec-label">LUTs</div>
+          <div class="spec-value">1,182K</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">BRAM</div>
+          <div class="spec-value">75.9 Mb</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">URAM</div>
+          <div class="spec-value">270 Mb</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">DSP Slices</div>
+          <div class="spec-value">6,840</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal reveal-delay-3" style="margin-top: 32px;">
+      <h3 style="font-family: var(--font-heading); font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">Implementation Steps</h3>
+      <ol class="steps-list">
+        <li>Create block diagram on VIVADO, SDK on VITIS &amp; program FPGA</li>
+        <li>Using UART, send test 4K image and store in DDR</li>
+        <li>Enable DMA to read image data from DDR and send to Distortion Correction Block</li>
+        <li>Receive corrected image and save in DDR using DMA</li>
+        <li>Send output image using UART back to Desktop</li>
+      </ol>
+    </div>
+
+    <div class="glass-card reveal reveal-delay-4" style="margin-top: 32px;">
+      <h3 style="font-family: var(--font-heading); font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: var(--accent);">Performance Parameters</h3>
+      <div class="spec-grid">
+        <div class="spec-item">
+          <div class="spec-label">Pixels per Frame</div>
+          <div class="spec-value">8.29M</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Frame Rate</div>
+          <div class="spec-value">60 FPS</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Pixel Rate</div>
+          <div class="spec-value">500 MHz</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Min Clock Freq</div>
+          <div class="spec-value">&ge; 200 MHz</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ==================== BUFFER DESIGN ==================== -->
+  <section class="section">
+    <div class="reveal">
+      <span class="section-label">Buffer Design</span>
+      <h2>RAM Splitting for Bilinear Interpolation</h2>
+    </div>
+
+    <div class="image-showcase image-glow reveal reveal-delay-1">
+      <img src="../images/slide6_img29.png" alt="Buffer design diagram showing four dual-port BRAMs with address line routing for bilinear interpolation" loading="lazy">
+      <p class="image-caption">Four dual-port BRAMs enabling 1 write and 4 reads per clock cycle</p>
+    </div>
+
+    <div class="glass-card reveal reveal-delay-2" style="margin-top: 32px;">
+      <ul class="detail-list">
+        <li>Using four Dual-port BRAMs such that 1 write and 4 reads happen in 1 clock cycle</li>
+        <li>Each BRAM is [256 &times; Width/2] wide</li>
+        <li>4 Address Lines to Read, 1 Address Line to Write</li>
+        <li>Input Image Writing Logic according to Bilinear Interpolation requirements</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- ==================== KEY RESULTS ==================== -->
+  <section class="section">
+    <div class="reveal">
+      <span class="section-label">Key Results</span>
+      <h2>Performance Benchmarks</h2>
+    </div>
+
+    <div class="results-grid">
+      <div class="result-card reveal reveal-delay-1">
+        <div class="result-value">60 FPS</div>
+        <div class="result-label">Real-time frame rate at 200 MHz clock frequency</div>
+      </div>
+      <div class="result-card reveal reveal-delay-2">
+        <div class="result-value">60%</div>
+        <div class="result-label">Lower power consumption vs GPU-based approaches</div>
+      </div>
+      <div class="result-card reveal reveal-delay-3">
+        <div class="result-value">4K</div>
+        <div class="result-label">3840&times;2160 resolution real-time processing</div>
+      </div>
+      <div class="result-card reveal reveal-delay-4">
+        <div class="result-value">8.29M</div>
+        <div class="result-label">Pixels per frame processed in real-time pipeline</div>
+      </div>
+    </div>
+
+    <div class="glass-card reveal" style="margin-top: 32px; text-align: center;">
+      <p class="section-text" style="margin: 0 auto;">
+        Critical for battery-powered wearable XR devices, enabling high-fidelity video
+        see-through with minimal latency and power overhead.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="page-footer">
+    <p>&copy; 2026 Sourabh Suri. All rights reserved.</p>
+  </footer>
+
+</div>
+
+<!-- ========================================
+   Scroll Reveal Animation
+   ======================================== -->
+<script>
+(function() {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    },
+    {
+      threshold: 0.1,
+      rootMargin: '0px 0px -40px 0px'
+    }
+  );
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real-Time HOI Detection Platform | Sourabh Suri</title>
+<meta name="description" content="Real-time human-object interaction detection platform with 5-layer pipeline architecture. YOLOX, DEIMv2, S3D, TIGER ActionFormer on RTX 4090 at 15 FPS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ========================================
+   CSS Custom Properties
+   ======================================== */
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+:root {
+  --bg-base: #0a0a0f;
+  --bg-card: rgba(15, 15, 25, 0.6);
+  --bg-glass: rgba(255, 255, 255, 0.04);
+  --bg-glass-hover: rgba(255, 255, 255, 0.08);
+  --accent: #00d4ff;
+  --accent-dim: rgba(0, 212, 255, 0.15);
+  --accent-glow: rgba(0, 212, 255, 0.4);
+  --accent-purple: #a855f7;
+  --accent-purple-dim: rgba(168, 85, 247, 0.15);
+  --text-primary: #e8e8f0;
+  --text-secondary: #8888a0;
+  --text-dim: #555570;
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glass-hover: rgba(0, 212, 255, 0.2);
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --glass-blur: 20px;
+  --radius: 16px;
+  --radius-sm: 8px;
+  --nav-height: 70px;
+  --max-width: 1000px;
+}
+
+/* ========================================
+   Reset & Base
+   ======================================== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-dim) var(--bg-base);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 3px; }
+
+a { color: var(--accent); text-decoration: none; transition: color 0.3s; }
+a:hover { color: #66e5ff; }
+
+img { max-width: 100%; display: block; }
+
+/* ========================================
+   Container & Utility
+   ======================================== */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Scroll reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-80px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.stagger-1 { transition-delay: 0.1s; }
+.stagger-2 { transition-delay: 0.2s; }
+.stagger-3 { transition-delay: 0.35s; }
+.stagger-4 { transition-delay: 0.5s; }
+
+/* Glassmorphism card */
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-glass-hover);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px var(--accent-dim);
+}
+
+/* ========================================
+   Back Navigation
+   ======================================== */
+.back-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  z-index: 1000;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+}
+
+.back-nav .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.3s;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
+.back-link svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s;
+}
+
+.back-link:hover svg {
+  transform: translateX(-4px);
+}
+
+.nav-logo {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  letter-spacing: 1px;
+}
+
+.nav-logo span {
+  color: var(--accent);
+}
+
+/* ========================================
+   Hero Section
+   ======================================== */
+.project-hero {
+  position: relative;
+  padding: 160px 0 80px;
+  overflow: hidden;
+}
+
+.project-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.hero-content h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-content .subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  font-weight: 300;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: var(--font-heading);
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 100px;
+  letter-spacing: 0.5px;
+}
+
+.tag.purple {
+  color: var(--accent-purple);
+  background: var(--accent-purple-dim);
+  border-color: rgba(168, 85, 247, 0.25);
+}
+
+/* ========================================
+   Content Sections
+   ======================================== */
+.project-section {
+  padding: 80px 0;
+}
+
+.project-section + .project-section {
+  border-top: 1px solid var(--border-glass);
+}
+
+.section-label {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.section-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+
+.section-heading::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  margin-top: 12px;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.section-text {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 800px;
+}
+
+/* ========================================
+   Full-width Image with Glow
+   ======================================== */
+.image-showcase {
+  margin: 40px 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 0 60px rgba(0, 212, 255, 0.08), 0 20px 80px rgba(0, 0, 0, 0.4);
+  transition: box-shadow 0.4s;
+}
+
+.image-showcase:hover {
+  box-shadow: 0 0 80px rgba(0, 212, 255, 0.15), 0 20px 80px rgba(0, 0, 0, 0.5);
+}
+
+.image-showcase img {
+  width: 100%;
+  display: block;
+}
+
+.image-caption {
+  padding: 16px 20px;
+  background: rgba(10, 10, 15, 0.8);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-style: italic;
+  border-top: 1px solid var(--border-glass);
+}
+
+/* ========================================
+   Key Results
+   ======================================== */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin: 32px 0;
+}
+
+.result-card {
+  padding: 28px;
+  text-align: center;
+}
+
+.result-card .result-value {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  text-shadow: 0 0 30px var(--accent-glow);
+}
+
+.result-card .result-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ========================================
+   Back to Top Button
+   ======================================== */
+.back-to-top {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s;
+  z-index: 999;
+  backdrop-filter: blur(10px);
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  background: rgba(0, 212, 255, 0.25);
+  box-shadow: 0 0 30px var(--accent-dim);
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+.project-footer {
+  padding: 40px 0;
+  border-top: 1px solid var(--border-glass);
+  text-align: center;
+}
+
+.footer-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  padding: 12px 28px;
+  border: 1px solid var(--border-glass);
+  border-radius: 100px;
+  transition: all 0.3s;
+}
+
+.footer-back:hover {
+  color: var(--accent);
+  border-color: rgba(0, 212, 255, 0.3);
+  background: var(--accent-dim);
+  box-shadow: 0 0 30px var(--accent-dim);
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 768px) {
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-hero {
+    padding: 120px 0 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tag-list {
+    gap: 6px;
+  }
+
+  .tag {
+    padding: 4px 12px;
+    font-size: 0.7rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ======== Back Navigation ======== -->
+<nav class="back-nav">
+  <div class="container">
+    <a href="../index.html#projects" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to Portfolio
+    </a>
+    <div class="nav-logo">S<span>.</span>SURI</div>
+  </div>
+</nav>
+
+<!-- ======== Hero Section ======== -->
+<section class="project-hero" id="top">
+  <div class="container">
+    <div class="hero-content reveal">
+      <h1>Real-Time HOI Detection Platform</h1>
+      <p class="subtitle">5-Layer Human-Object Interaction Pipeline on RTX 4090 at 15 FPS</p>
+      <div class="tag-list">
+        <span class="tag">YOLOX</span>
+        <span class="tag">DEIMv2</span>
+        <span class="tag">S3D</span>
+        <span class="tag">TIGER</span>
+        <span class="tag">ActionFormer</span>
+        <span class="tag purple">GNN</span>
+        <span class="tag purple">CUDA</span>
+        <span class="tag purple">Real-Time</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== Overview ======== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Overview</p>
+      <h2 class="section-heading">Project Summary</h2>
+      <p class="section-text">
+        A real-time human-object interaction detection system built for retail IP pop-up shops.
+        The platform ingests live camera feeds at 15 FPS and runs a 5-layer pipeline &mdash; from YOLO pose estimation
+        and DEIMv2 object detection, through S3D spatiotemporal features, to TIGER graph-based interaction classification &mdash;
+        all within a 97.2% GPU compute budget on a single RTX 4090.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== Pipeline Architecture ======== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Architecture</p>
+      <h2 class="section-heading">Pipeline Architecture</h2>
+      <p class="section-text">
+        5-layer real-time pipeline: Ingestion (0ms overhead), Detection (~42ms/frame), S3D feature extraction at 3.75 Hz,
+        TIGER interaction classification, and sustained trigger with feedback.
+      </p>
+    </div>
+
+    <div class="image-showcase reveal stagger-1">
+      <img src="../images/slide10_img58.png" alt="Real-Time HOI Detection Pipeline Architecture - 5-layer system diagram" loading="lazy">
+      <div class="image-caption">5-layer architecture: Ingestion &rarr; Detection (YOLO 26x-Pose + DEIMv2) &rarr; S3D @3.75Hz &rarr; TIGER @3.75Hz &rarr; Trigger + Feedback</div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== Cold Start Timeline ======== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Boot Sequence</p>
+      <h2 class="section-heading">Cold Start Timeline</h2>
+      <p class="section-text">
+        From power-on to first trigger in 4.27 seconds. The timeline traces how each layer progressively fills its buffer:
+        camera frames accumulate, detection begins, S3D ramps up feature extraction, predictions fill the trigger deque, and the system fires.
+      </p>
+    </div>
+
+    <div class="image-showcase reveal stagger-1">
+      <img src="../images/slide10_img57.png" alt="Timeline - Cold Start to First Trigger showing 5-layer ramp-up to 4.27s" loading="lazy">
+      <div class="image-caption">Cold start timeline: Buffer fill &rarr; S3D ramp-up &rarr; Predictions accumulate &rarr; Trigger fires at 4.27s</div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== GPU Compute Budget ======== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Performance</p>
+      <h2 class="section-heading">GPU Compute Budget</h2>
+      <p class="section-text">
+        At 15 FPS on an RTX 4090, the full pipeline consumes 972ms of the available 1000ms budget per second &mdash;
+        97.2% GPU utilization with zero frame drops. DEIMv2 takes the largest share at 37.5%, followed by TIGER at 26.3%.
+      </p>
+    </div>
+
+    <div class="image-showcase reveal stagger-1">
+      <img src="../images/slide10_img59.png" alt="GPU Compute Budget per Second on RTX 4090 - stacked bar and donut chart" loading="lazy">
+      <div class="image-caption">GPU budget breakdown: YOLO 255ms (25.5%) + DEIMv2 375ms (37.5%) + S3D 79ms (7.9%) + TIGER 263ms (26.3%) = 972ms / 1000ms</div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== Feature Lifecycle ======== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Sliding Window</p>
+      <h2 class="section-heading">Feature Lifecycle</h2>
+      <p class="section-text">
+        TIGER operates over a 10-second sliding window containing 37 S3D features and 150 graph frames.
+        Stale features from completed interactions are discarded as the window advances, keeping memory bounded
+        and predictions focused on the current interaction context.
+      </p>
+    </div>
+
+    <div class="image-showcase reveal stagger-1">
+      <img src="../images/slide10_img60.png" alt="TIGER Sliding Window (10s) - Feature Lifecycle with discarded, active, and future regions" loading="lazy">
+      <div class="image-caption">TIGER 10s sliding window: active window holds 37 S3D features + 150 graph frames; stale features are dropped</div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== End-to-End Latency ======== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Latency</p>
+      <h2 class="section-heading">End-to-End Latency Analysis</h2>
+      <p class="section-text">
+        The system achieves ~3.2 seconds end-to-end latency from ground truth event on camera to system trigger output.
+        The analysis includes a latency breakdown by pipeline stage, and a comparison showing that 30 FPS would exceed
+        the GPU budget at 1943ms per second.
+      </p>
+    </div>
+
+    <div class="image-showcase reveal stagger-1">
+      <img src="../images/slide10_img61.png" alt="End-to-End Latency Analysis - GT vs System Trigger, breakdown, and 15 vs 30 FPS comparison" loading="lazy">
+      <div class="image-caption">E2E latency: ~3.2s from ground truth to trigger output; 15 FPS fits budget, 30 FPS exceeds at 1943ms</div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== Live Demo ======== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Demo</p>
+      <h2 class="section-heading">GT vs Predictions &amp; Annotated Output</h2>
+      <p class="section-text">
+        Side-by-side comparison of ground truth labels against system predictions, with annotated video output
+        showing real-time confidence scores overlaid on the camera feed.
+      </p>
+    </div>
+
+    <div class="image-showcase reveal stagger-1">
+      <img src="../images/slide10_img62.png" alt="GT vs Predictions and Annotated Output Video with confidence scores" loading="lazy">
+      <div class="image-caption">Ground truth vs predictions (green = correct, orange = predicted) and annotated video output with confidence scores</div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== Key Results ======== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Impact</p>
+      <h2 class="section-heading">Key Results</h2>
+    </div>
+
+    <div class="results-grid">
+      <div class="glass-card result-card reveal stagger-1">
+        <div class="result-value">15 FPS</div>
+        <div class="result-label">Real-time inference on a single RTX 4090 GPU</div>
+      </div>
+      <div class="glass-card result-card reveal stagger-2">
+        <div class="result-value">4.27s</div>
+        <div class="result-label">Cold start to first trigger fire</div>
+      </div>
+      <div class="glass-card result-card reveal stagger-3">
+        <div class="result-value">97.2%</div>
+        <div class="result-label">GPU compute budget utilized per second</div>
+      </div>
+      <div class="glass-card result-card reveal stagger-4">
+        <div class="result-value">~3.2s</div>
+        <div class="result-label">End-to-end latency from event to system trigger</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== Footer ======== -->
+<footer class="project-footer">
+  <div class="container">
+    <a href="../index.html#projects" class="footer-back">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to Portfolio
+    </a>
+  </div>
+</footer>
+
+<!-- ======== Back to Top Button ======== -->
+<button class="back-to-top" id="backToTop" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
+
+<!-- ======== Scripts ======== -->
+<script>
+// Scroll reveal via IntersectionObserver
+document.addEventListener('DOMContentLoaded', () => {
+  const reveals = document.querySelectorAll('.reveal, .reveal-left');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -60px 0px'
+  });
+
+  reveals.forEach(el => observer.observe(el));
+
+  // Back to top button visibility
+  const backToTop = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+      backToTop.classList.add('visible');
+    } else {
+      backToTop.classList.remove('visible');
+    }
+  }, { passive: true });
+});
+</script>
+</body>
+</html>

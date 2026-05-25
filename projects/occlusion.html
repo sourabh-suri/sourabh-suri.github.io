@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Occlusion Algorithm | Sourabh Suri</title>
+<meta name="description" content="Real-Time Hand Mesh Generation for AR Pass-Through — Occlusion Algorithm project by Sourabh Suri at Sony Corporation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ========================================
+   CSS Custom Properties
+   ======================================== */
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+:root {
+  --bg-base: #0a0a0f;
+  --bg-card: rgba(15, 15, 25, 0.6);
+  --bg-glass: rgba(255, 255, 255, 0.04);
+  --bg-glass-hover: rgba(255, 255, 255, 0.08);
+  --accent: #00d4ff;
+  --accent-dim: rgba(0, 212, 255, 0.15);
+  --accent-glow: rgba(0, 212, 255, 0.4);
+  --accent-purple: #a855f7;
+  --accent-purple-dim: rgba(168, 85, 247, 0.15);
+  --text-primary: #e8e8f0;
+  --text-secondary: #8888a0;
+  --text-dim: #555570;
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glass-hover: rgba(0, 212, 255, 0.2);
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --glass-blur: 20px;
+  --radius: 16px;
+  --radius-sm: 8px;
+  --max-width: 1000px;
+}
+
+/* ========================================
+   Reset & Base
+   ======================================== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-dim) var(--bg-base);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 3px; }
+
+a { color: var(--accent); text-decoration: none; transition: color 0.3s; }
+a:hover { color: #66e5ff; }
+
+img { max-width: 100%; display: block; }
+
+/* ========================================
+   Container
+   ======================================== */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ========================================
+   Back Navigation
+   ======================================== */
+.back-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  z-index: 1000;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.back-nav .container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  transition: all 0.3s;
+}
+
+.back-link:hover {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.back-link svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s;
+}
+
+.back-link:hover svg {
+  transform: translateX(-4px);
+}
+
+/* ========================================
+   Hero Section
+   ======================================== */
+.project-hero {
+  position: relative;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 140px 24px 80px;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(ellipse 600px 400px at 30% 20%, rgba(0, 212, 255, 0.08), transparent),
+    radial-gradient(ellipse 500px 500px at 70% 60%, rgba(168, 85, 247, 0.06), transparent),
+    radial-gradient(ellipse 800px 300px at 50% 80%, rgba(0, 212, 255, 0.04), transparent);
+  animation: heroDrift 20s ease-in-out infinite;
+}
+
+@keyframes heroDrift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -20px) rotate(1deg); }
+  66% { transform: translate(-20px, 15px) rotate(-1deg); }
+}
+
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(to top, var(--bg-base), transparent);
+  z-index: 1;
+}
+
+/* Floating grid lines behind hero */
+.hero-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+}
+
+.hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 7vw, 4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 300;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  letter-spacing: 0.5px;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.hero-tag {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 6px 16px;
+  border-radius: 100px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  letter-spacing: 0.3px;
+}
+
+/* ========================================
+   Scroll Reveal Animations
+   ======================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.92) translateY(30px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.stagger-1 { transition-delay: 0.1s; }
+.stagger-2 { transition-delay: 0.2s; }
+.stagger-3 { transition-delay: 0.35s; }
+.stagger-4 { transition-delay: 0.5s; }
+.stagger-5 { transition-delay: 0.65s; }
+
+/* ========================================
+   Section Styling
+   ======================================== */
+.project-section {
+  padding: 80px 0;
+  position: relative;
+}
+
+.project-section + .project-section {
+  border-top: 1px solid var(--border-glass);
+}
+
+.section-label {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--accent);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-label::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.section-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.section-text {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 750px;
+}
+
+/* ========================================
+   Glass Card
+   ======================================== */
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  padding: 32px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-glass-hover);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px var(--accent-dim);
+}
+
+/* ========================================
+   Full-Width Image with Glow
+   ======================================== */
+.image-showcase {
+  position: relative;
+  margin: 40px 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border-glass);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.image-showcase::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(var(--radius) + 2px);
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), transparent 40%, transparent 60%, rgba(168, 85, 247, 0.1));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.image-showcase:hover::before {
+  opacity: 1;
+}
+
+.image-showcase img {
+  width: 100%;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.image-showcase:hover img {
+  transform: scale(1.02);
+}
+
+.image-caption {
+  padding: 16px 24px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  background: rgba(10, 10, 15, 0.8);
+  border-top: 1px solid var(--border-glass);
+  font-style: italic;
+}
+
+/* ========================================
+   Numbered Methods List
+   ======================================== */
+.methods-grid {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.method-item {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 20px 24px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.method-item:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-glass-hover);
+  transform: translateX(8px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-dim);
+}
+
+.method-num {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  min-width: 36px;
+  text-shadow: 0 0 20px var(--accent-glow);
+}
+
+.method-content strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.method-content {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.method-content code {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  padding: 2px 8px;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  border-radius: 4px;
+  color: var(--accent);
+}
+
+/* ========================================
+   Performance Table
+   ======================================== */
+.perf-table-wrapper {
+  overflow-x: auto;
+  margin: 24px 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-glass);
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+.perf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.perf-table thead {
+  background: rgba(0, 212, 255, 0.06);
+}
+
+.perf-table th {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent);
+  padding: 16px 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.perf-table td {
+  padding: 14px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+}
+
+.perf-table tbody tr {
+  transition: all 0.3s;
+}
+
+.perf-table tbody tr:hover {
+  background: rgba(0, 212, 255, 0.04);
+}
+
+.perf-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.perf-table .highlight-row {
+  background: rgba(0, 212, 255, 0.06);
+}
+
+.perf-table .highlight-row td {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ========================================
+   Key Insight Callout
+   ======================================== */
+.callout {
+  position: relative;
+  margin: 32px 0;
+  padding: 28px 32px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.06) 0%, rgba(168, 85, 247, 0.04) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  overflow: hidden;
+}
+
+.callout::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--accent), var(--accent-purple));
+  border-radius: 2px;
+}
+
+.callout-label {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.callout-value {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 6px;
+}
+
+.callout-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+/* ========================================
+   Key Results Grid
+   ======================================== */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 32px;
+}
+
+.result-card {
+  text-align: center;
+  padding: 32px 20px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.result-card:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-glass-hover);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px var(--accent-dim);
+}
+
+.result-value {
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  text-shadow: 0 0 30px var(--accent-glow);
+}
+
+.result-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ========================================
+   Three-Panel Demo Caption
+   ======================================== */
+.demo-panels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.demo-panel-label {
+  text-align: center;
+  padding: 12px 8px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.demo-panel-label strong {
+  display: block;
+  color: var(--accent);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+.project-footer {
+  padding: 60px 0;
+  text-align: center;
+  border-top: 1px solid var(--border-glass);
+}
+
+.footer-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 14px 32px;
+  border-radius: 100px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(0, 212, 255, 0.25);
+  transition: all 0.3s;
+}
+
+.footer-back:hover {
+  background: rgba(0, 212, 255, 0.2);
+  box-shadow: 0 0 40px var(--accent-dim);
+  transform: translateY(-2px);
+}
+
+.footer-back svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s;
+}
+
+.footer-back:hover svg {
+  transform: translateX(-4px);
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 768px) {
+  .project-hero {
+    min-height: 60vh;
+    padding: 120px 16px 60px;
+  }
+
+  .project-section {
+    padding: 60px 0;
+  }
+
+  .glass-card {
+    padding: 24px;
+  }
+
+  .method-item {
+    padding: 16px 18px;
+  }
+
+  .demo-panels {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .results-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .perf-table th,
+  .perf-table td {
+    padding: 12px 16px;
+    font-size: 0.82rem;
+  }
+
+  .callout {
+    padding: 20px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-tags {
+    gap: 6px;
+  }
+
+  .hero-tag {
+    font-size: 0.72rem;
+    padding: 4px 12px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ========================================
+     Back Navigation
+     ======================================== -->
+<nav class="back-nav">
+  <div class="container">
+    <a href="../index.html#projects" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Portfolio
+    </a>
+  </div>
+</nav>
+
+<!-- ========================================
+     Hero Section
+     ======================================== -->
+<section class="project-hero">
+  <div class="hero-bg">
+    <div class="hero-grid"></div>
+  </div>
+  <div class="hero-content">
+    <h1 class="hero-title reveal">Occlusion Algorithm</h1>
+    <p class="hero-subtitle reveal stagger-1">Real-Time Hand Mesh Generation for AR Pass-Through</p>
+    <div class="hero-tags reveal stagger-2">
+      <span class="hero-tag">Hand Mesh</span>
+      <span class="hero-tag">Triangularization</span>
+      <span class="hero-tag">Depth Estimation</span>
+      <span class="hero-tag">AR Pass-Through</span>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+     Overview
+     ======================================== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">Overview</span>
+      <h2 class="section-heading">Seamless Virtual-Real Object Occlusion</h2>
+      <p class="section-text">
+        Real-time hand-mesh generation enabling seamless virtual-real object occlusion in AR pass-through mode. Engineered custom triangularization achieving <strong style="color:var(--accent)">88.5x speedup</strong> over baseline Open3D methods, allowing convincing hand-over-virtual-object rendering at interactive frame rates on constrained hardware.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+     System Pipeline Architecture
+     ======================================== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">Architecture</span>
+      <h2 class="section-heading">System Pipeline</h2>
+      <p class="section-text">
+        End-to-end processing pipeline from stereo camera input to final composited output, spanning library (.dll/.so) and application layers.
+      </p>
+    </div>
+
+    <div class="image-showcase reveal-scale">
+      <img src="../images/slide5_img24.png" alt="System pipeline architecture: CG Image and VST Image inputs through resize, hand mask estimation, depth map estimation, fine depth generation, compositor to final image" loading="lazy">
+      <div class="image-caption">Full processing pipeline — from CG + VST image inputs through hand mask and depth estimation to final composited output</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+     Hand Mesh Methods
+     ======================================== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">Approach</span>
+      <h2 class="section-heading">Hand Mesh Methods</h2>
+    </div>
+
+    <div class="image-showcase reveal-scale">
+      <img src="../images/slide5_img18.png" alt="Five different hand mesh generation approaches explored for real-time AR occlusion" loading="lazy">
+      <div class="image-caption">Five mesh reconstruction approaches evaluated for real-time hand occlusion</div>
+    </div>
+
+    <div class="methods-grid">
+      <div class="method-item reveal stagger-1">
+        <span class="method-num">01</span>
+        <div class="method-content">
+          <strong>Front Surface of Hand Triangularization</strong><br>
+          <code>create_from_point_cloud</code>, oriented normals
+        </div>
+      </div>
+      <div class="method-item reveal stagger-2">
+        <span class="method-num">02</span>
+        <div class="method-content">
+          <strong>Poisson Surface Reconstruction</strong><br>
+          Dense surface fitting from oriented point cloud
+        </div>
+      </div>
+      <div class="method-item reveal stagger-3">
+        <span class="method-num">03</span>
+        <div class="method-content">
+          <strong>Front+Back Surface Triangularization</strong><br>
+          One solid mesh covering both hand surfaces
+        </div>
+      </div>
+      <div class="method-item reveal stagger-4">
+        <span class="method-num">04</span>
+        <div class="method-content">
+          <strong>Adjacent Joint Connecting Mesh</strong><br>
+          <code>triangles.append(i5, r1, l)</code> &mdash; topology-aware connectivity
+        </div>
+      </div>
+      <div class="method-item reveal stagger-5">
+        <span class="method-num">05</span>
+        <div class="method-content">
+          <strong>Alpha Shape Reconstruction</strong><br>
+          <code>create_from_point_cloud</code>, <code>alpha_shape</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+     Performance Comparison
+     ======================================== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">Benchmarks</span>
+      <h2 class="section-heading">Performance Comparison</h2>
+      <p class="section-text" style="margin-bottom:8px;">
+        Benchmarked on 13th Gen Intel i9-13900KF, 64 GB RAM, 3.00 GHz
+      </p>
+    </div>
+
+    <div class="image-showcase reveal-scale">
+      <img src="../images/slide5_img19.png" alt="Performance comparison chart showing mean processing times across mesh generation methods" loading="lazy">
+      <div class="image-caption">Mean processing time comparison across five mesh generation approaches</div>
+    </div>
+
+    <div class="perf-table-wrapper reveal">
+      <table class="perf-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Mean Time (ms)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Open-3D alpha-shape</td>
+            <td>11.345</td>
+          </tr>
+          <tr>
+            <td>Custom alpha-shape (rewritten logic)</td>
+            <td>3.054 (Max 56.4)</td>
+          </tr>
+          <tr>
+            <td>Front Surface of Hand Triangularization</td>
+            <td>0.376</td>
+          </tr>
+          <tr>
+            <td>Front+Back Surface (One solid Mesh)</td>
+            <td>0.329</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Front Surface (simple logic)</td>
+            <td>0.128</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout reveal">
+      <div class="callout-label">Key Insight</div>
+      <div class="callout-value">88.5x Faster</div>
+      <div class="callout-desc">From 11.345 ms (Open-3D alpha-shape) down to 0.128 ms (Front Surface simple logic)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+     Real-Time Demo
+     ======================================== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">Visualization</span>
+      <h2 class="section-heading">Real-Time Demo</h2>
+    </div>
+
+    <div class="image-showcase reveal-scale">
+      <img src="../images/slide5_img20.png" alt="Real-time demo screenshot: three-panel view showing Original Joints, 3D Mesh View, and Depth Heatmap with frame counter" loading="lazy">
+      <div class="image-caption">Real-time 3-panel view — hand joints overlaid on VR scene, 3D mesh rendering, and depth heatmap with frame counter</div>
+    </div>
+
+    <div class="image-showcase reveal-scale">
+      <img src="../images/slide5_img21.png" alt="Three-panel real-time visualization: original joints, 3D mesh, and depth heatmap" loading="lazy">
+      <div class="image-caption">Three-panel live visualization of hand tracking, mesh reconstruction, and depth estimation</div>
+    </div>
+
+    <div class="demo-panels reveal">
+      <div class="demo-panel-label">
+        <strong>Original + Joints</strong>
+        Hand keypoints with color-coded joint tracking
+      </div>
+      <div class="demo-panel-label">
+        <strong>3D Mesh View</strong>
+        Reconstructed surface mesh in real time
+      </div>
+      <div class="demo-panel-label">
+        <strong>Depth Heatmap</strong>
+        0.100 m to 0.600 m range depth visualization
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+     Live Demo (Animated GIF)
+     ======================================== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">Live Demo</span>
+      <h2 class="section-heading">System in Action</h2>
+      <p class="section-text">
+        Animated demonstration of the hand occlusion system running in real time — showing 3D surface mesh generation with joints overlaid on the AR pass-through view.
+      </p>
+    </div>
+
+    <div class="image-showcase reveal-scale" style="border-color: rgba(0, 212, 255, 0.25); box-shadow: 0 0 40px rgba(0, 212, 255, 0.08);">
+      <img src="../images/slide5_img23.gif" alt="Animated demo of the hand occlusion system in action — real-time 3D surface mesh generation with joints overlaid" loading="eager">
+      <div class="image-caption">Live capture — real-time hand mesh generation and occlusion rendering (animated)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+     Depth Map Methods
+     ======================================== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">Depth Estimation</span>
+      <h2 class="section-heading">Depth Map Methods</h2>
+    </div>
+
+    <div class="image-showcase reveal-scale">
+      <img src="../images/slide5_img22.png" alt="Comparison of five depth estimation approaches for hand occlusion" loading="lazy" style="max-width: 100%; height: auto; object-fit: contain; max-height: 500px; margin: 0 auto;">
+      <div class="image-caption">Five depth estimation approaches compared for hand-region depth completion</div>
+    </div>
+
+    <div class="methods-grid">
+      <div class="method-item reveal stagger-1">
+        <span class="method-num">01</span>
+        <div class="method-content">
+          <strong>Circular Kernel Dilation</strong> (size=15)
+        </div>
+      </div>
+      <div class="method-item reveal stagger-2">
+        <span class="method-num">02</span>
+        <div class="method-content">
+          <strong>Circular Kernel Dilation</strong> (size=5)
+        </div>
+      </div>
+      <div class="method-item reveal stagger-3">
+        <span class="method-num">03</span>
+        <div class="method-content">
+          <strong>Radial Basis Function (RBF)</strong>
+        </div>
+      </div>
+      <div class="method-item reveal stagger-4">
+        <span class="method-num">04</span>
+        <div class="method-content">
+          <strong>Convex Hull Method</strong>
+        </div>
+      </div>
+      <div class="method-item reveal stagger-5">
+        <span class="method-num">05</span>
+        <div class="method-content">
+          <strong>Plane-Preserving Dilation</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="image-showcase reveal-scale" style="margin-top: 40px;">
+      <img src="../images/slide5_img25.png" alt="RANSAC vs RBF depth estimation: 3-panel view showing RANSAC and RBF left/right hand overlaid on AR scene, with TOP and SIDE 3D views" loading="lazy">
+      <div class="image-caption">RANSAC vs RBF depth estimation — left/right hand comparison with TOP and SIDE 3D views</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+     Key Results
+     ======================================== -->
+<section class="project-section">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">Impact</span>
+      <h2 class="section-heading">Key Results</h2>
+    </div>
+
+    <div class="results-grid">
+      <div class="result-card reveal-scale stagger-1">
+        <div class="result-value">88.5x</div>
+        <div class="result-label">Speedup over Open-3D baseline</div>
+      </div>
+      <div class="result-card reveal-scale stagger-2">
+        <div class="result-value">0.128ms</div>
+        <div class="result-label">Per frame mesh generation</div>
+      </div>
+      <div class="result-card reveal-scale stagger-3">
+        <div class="result-value">Seamless</div>
+        <div class="result-label">Virtual-real object occlusion</div>
+      </div>
+      <div class="result-card reveal-scale stagger-4">
+        <div class="result-value">Real-Time</div>
+        <div class="result-label">Interactive frame rates on constrained hardware</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+     Footer
+     ======================================== -->
+<footer class="project-footer">
+  <div class="container">
+    <a href="../index.html#projects" class="footer-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Portfolio
+    </a>
+  </div>
+</footer>
+
+<!-- ========================================
+     Scroll Reveal Script
+     ======================================== -->
+<script>
+(function() {
+  // IntersectionObserver for scroll-triggered reveals
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px 0px -60px 0px',
+    threshold: 0.1
+  };
+
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  // Observe all reveal elements
+  document.querySelectorAll('.reveal, .reveal-scale').forEach(function(el) {
+    observer.observe(el);
+  });
+
+  // Parallax-like subtle movement on hero
+  var heroContent = document.querySelector('.hero-content');
+  var heroSection = document.querySelector('.project-hero');
+
+  if (heroContent && heroSection) {
+    window.addEventListener('scroll', function() {
+      var scrolled = window.pageYOffset;
+      var heroHeight = heroSection.offsetHeight;
+      if (scrolled < heroHeight) {
+        var opacity = 1 - (scrolled / heroHeight) * 0.8;
+        var translate = scrolled * 0.3;
+        heroContent.style.opacity = opacity;
+        heroContent.style.transform = 'translateY(' + translate + 'px)';
+      }
+    }, { passive: true });
+  }
+
+  // Navbar hide/show on scroll
+  var backNav = document.querySelector('.back-nav');
+  var lastScroll = 0;
+  window.addEventListener('scroll', function() {
+    var currentScroll = window.pageYOffset;
+    if (currentScroll > lastScroll && currentScroll > 200) {
+      backNav.style.transform = 'translateY(-100%)';
+    } else {
+      backNav.style.transform = 'translateY(0)';
+    }
+    lastScroll = currentScroll;
+  }, { passive: true });
+})();
+</script>
+
+</body>
+</html>
